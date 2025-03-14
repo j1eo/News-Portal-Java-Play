@@ -1,8 +1,28 @@
-logs
-target
-/.idea
-/.idea_modules
-/.classpath
-/.project
-/.settings
-/RUNNING_PID
+# Logs y carpetas generadas automáticamente
+logs/
+target/
+tmp/
+
+# Configuraciones del IDE
+.idea/
+.idea_modules/
+.classpath
+.project
+.settings/
+
+# Archivos y procesos específicos de Play!
+bin/
+db/
+.eclipse
+lib/
+modules/
+project/project
+project/target
+test-result
+server.pid
+RUNNING_PID
+dist/
+.cache
+
+# Otros archivos innecesarios
+*.eml
