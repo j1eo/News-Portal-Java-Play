@@ -10,6 +10,10 @@ tmp/
 .project
 .settings/
 
+#DB properties
+*.properties
+
+
 # Archivos y procesos específicos de Play!
 bin/
 db/
