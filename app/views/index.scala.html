@@ -1,6 +1,6 @@
 @(message: String)
 
-@main("UR NEWS -- Pagina Principal") {
+@main("UR NEWS -- Página Principal") {
     <header>
         <h1>@message</h1>
     </header>
@@ -30,13 +30,17 @@
         <!-- Formulario para agregar artículos -->
         <section>
             <h2>Agregar un Artículo</h2>
-            <form id="form-articulo">
-                <input type="text" id="titulo" placeholder="Título" required>
-                <textarea id="contenido" placeholder="Contenido" required></textarea>
-                <button type="submit">Publicar</button>
-            </form>
+            <div class="form-container">
+                <form id="form-articulo">
+                    <input type="text" id="titulo" placeholder="Título" required />
+                    <textarea id="contenido" placeholder="Contenido" required></textarea>
+                    <button type="submit">Publicar</button>
+                </form>
+            </div>
         </section>
     </main>
 
-    <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
+    <!-- Archivos JavaScript -->
+    <script src="@routes.Assets.versioned("javascripts/articulos.js")" type="module"></script>
+    <script src="@routes.Assets.versioned("javascripts/main.js")" type="module"></script>
 }
