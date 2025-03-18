@@ -28,5 +28,9 @@ RUNNING_PID
 dist/
 .cache
 
+# Ignorar toda la carpeta conf/
+conf/
+
+
 # Otros archivos innecesarios
 *.eml
