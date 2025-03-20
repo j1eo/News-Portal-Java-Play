@@ -6,6 +6,7 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class ArticulosController extends Controller {
@@ -21,11 +22,15 @@ public class ArticulosController extends Controller {
         try {
             List<Articulo> articulos = articuloService.obtenerArticulos();
             return ok(Json.toJson(articulos)); // Devuelve los artículos en formato JSON
+        } catch (SQLException e) {
+            System.err.println("Error en la base de datos: " + e.getMessage());
+            return internalServerError("Error en la base de datos al obtener los artículos");
         } catch (Exception e) {
-            e.printStackTrace();
-            return internalServerError("Error al obtener los artículos");
+            System.err.println("Error desconocido: " + e.getMessage());
+            return internalServerError("Error desconocido al obtener los artículos");
         }
     }
+
 
     // Endpoint para agregar un nuevo artículo
     public Result agregarArticulo() {
