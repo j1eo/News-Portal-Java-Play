@@ -20,3 +20,4 @@ public class Articulo {
     public String getContenido() { return contenido; }
     public Date getFechaPublicacion() { return fechaPublicacion; }
 }
+	
