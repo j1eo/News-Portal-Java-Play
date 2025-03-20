@@ -18,7 +18,6 @@ tmp/
 bin/
 db/
 .eclipse
-lib/
 modules/
 project/project
 project/target
