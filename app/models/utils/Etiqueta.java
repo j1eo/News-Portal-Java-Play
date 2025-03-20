@@ -1,0 +1,12 @@
+package models.utils;
+
+public enum Etiqueta {
+	DEPORTES,
+	ECONOMIA,
+	ENTRETENIMIENTO,
+	TECNOLOGIA,
+	CIENCIA,
+	POLITICA,
+	SALUD,
+	INTERNACIONAL
+	}
