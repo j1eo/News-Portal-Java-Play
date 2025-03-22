@@ -1,62 +1,84 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Cargar noticias y artículos al iniciar
     cargarNoticias();
     cargarArticulos();
 
+    // Configurar el formulario para agregar artículos
     document.getElementById("form-articulo").addEventListener("submit", function (event) {
         event.preventDefault();
         agregarArticulo();
     });
+
+	document.getElementById("overlay").addEventListener("click", closeNav);
+
+	function openNav() {
+	    document.getElementById("mySidenav").style.width = "450px";
+	    document.getElementById("overlay").style.display = "block"; // Mostrar el overlay
+	}
+
+	function closeNav() {
+	    document.getElementById("mySidenav").style.width = "0";
+	    document.getElementById("overlay").style.display = "none"; // Ocultar el overlay
+	}
+
+    // Eventos para el sidenav
+    document.querySelector(".closebtn").addEventListener("click", closeNav);
+    document.querySelector("[onclick='openNav()']").addEventListener("click", openNav);
 });
 
+// Funciones para cargar noticias
 function cargarNoticias() {
     fetch("/noticias")
         .then(response => response.json())
         .then(data => {
-            // Noticias Principales
-            const noticiaPrincipal = document.getElementById("noticia-principal");
-            const noticiaSecundaria = document.getElementById("noticia-secundaria");
+            const noticiaPrincipal = document.querySelector(".main-news");
+            const noticiaSecundaria1 = document.getElementById("noticia-secundaria-1");
+            const noticiaSecundaria2 = document.getElementById("noticia-secundaria-2");
+            const noticiasLista = document.getElementById("noticias-lista");
 
             if (data.length > 0) {
                 const principal = data[0];
                 noticiaPrincipal.innerHTML = `
                     <img src="${principal.imagen}" alt="${principal.titulo}">
-                    <h1>${principal.titulo}</h1>
-                    <p>${principal.descripcion}</p>
-                    <a href="${principal.url}" target="_blank">Leer más</a>
-                `;
+                    <div class="main-news-text">
+                        <h1>${principal.titulo}</h1>
+                        <p>${principal.descripcion}</p>
+                        <a href="${principal.url}" target="_blank">Leer más</a>
+                    </div>`;
             }
 
             if (data.length > 1) {
-                const secundaria = data[1];
-                noticiaSecundaria.innerHTML = `
-                    <img src="${secundaria.imagen}" alt="${secundaria.titulo}">
-                    <h2>${secundaria.titulo}</h2>
-                    <p>${secundaria.descripcion}</p>
-                    <a href="${secundaria.url}" target="_blank">Leer más</a>
-                `;
+                noticiaSecundaria1.innerHTML = `
+                    <img src="${data[1].imagen}" alt="${data[1].titulo}">
+                    <h2>${data[1].titulo}</h2>
+                    <p>${data[1].descripcion}</p>
+                    <a href="${data[1].url}" target="_blank">Leer más</a>`;
             }
 
-            // Noticias Adicionales (Limitar a 6 elementos para 2 filas)
-            const noticiasLista = document.getElementById("noticias-lista");
-            const maxNoticias = 8; // Ajusta este valor según el número de filas deseadas
-            const noticiasAdicionales = data.slice(2, 2 + maxNoticias); // Noticias desde la tercera
+            if (data.length > 2) {
+                noticiaSecundaria2.innerHTML = `
+                    <img src="${data[2].imagen}" alt="${data[2].titulo}">
+                    <h2>${data[2].titulo}</h2>
+                    <p>${data[2].descripcion}</p>
+                    <a href="${data[2].url}" target="_blank">Leer más</a>`;
+            }
 
-            noticiasAdicionales.forEach(noticia => {
+            noticiasLista.innerHTML = "";
+            data.slice(3, 11).forEach(noticia => {
                 const item = document.createElement("div");
                 item.className = "news-card";
                 item.innerHTML = `
                     <img src="${noticia.imagen}" alt="${noticia.titulo}">
                     <h3>${noticia.titulo}</h3>
                     <p>${noticia.descripcion}</p>
-                    <a href="${noticia.url}" target="_blank">Leer más</a>
-                `;
+                    <a href="${noticia.url}" target="_blank">Leer más</a>`;
                 noticiasLista.appendChild(item);
             });
         })
         .catch(error => console.error("Error al cargar noticias:", error));
 }
 
-
+// Funciones para cargar artículos
 function cargarArticulos() {
     fetch("/articulos")
         .then(response => response.json())
@@ -72,6 +94,7 @@ function cargarArticulos() {
         .catch(error => console.error("Error al cargar artículos:", error));
 }
 
+// Función para agregar un artículo nuevo
 function agregarArticulo() {
     const titulo = document.getElementById("titulo").value;
     const contenido = document.getElementById("contenido").value;
@@ -83,7 +106,7 @@ function agregarArticulo() {
     })
     .then(response => {
         if (response.ok) {
-            cargarArticulos(); // Recargar lista de artículos
+            cargarArticulos();
             document.getElementById("form-articulo").reset();
         } else {
             console.error("Error al agregar artículo");
