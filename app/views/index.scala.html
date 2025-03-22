@@ -1,23 +1,77 @@
 @(message: String)
 
 @main("UR NEWS -- Pagina Principal") {
-    <header>
-        <h1>@message</h1>
-    </header>
 
+	<header>
+	    <div class="container">
+			
+			<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+			           
+	        <div class="logo">
+	            <img src="/assets/images/LOGO.png" alt="Logo">
+	            <h1>@message</h1>
+	        </div>
+	        <div class="buttons">
+	            <button class="btn btn-primary">INICIAR SESION</button>  <!-- Botón principal -->
+	            <button class="btn btn-secondary">SUSCRIBETE</button> <!-- Botón secundario -->
+	        </div>
+	    </div>
+	</header>
+	
+	<div id="mySidenav" class="sidenav">
+	    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">X</a>
+	    <p>Descubre las últimas noticias</p>
+	    <div class="search-container">
+	        <input
+	            type="text"
+	            id="searchInput"
+	            class="search-bar"
+	            placeholder="Buscar..."
+	            oninput="filtrarResultados()" 
+	        />
+	    </div>
+	    <a href="#">Noticias Locales</a>
+	    <a href="#">Noticias Nacionales</a>
+	    <a href="#">Artículos</a>
+	    <a href="#">Preguntas Frecuentes</a>
+	</div>
+
+	
+	
     <main>
+		<div id="overlay"></div>
         <!-- Noticias Destacadas -->
-        <section class="main-news">
-            <h2>Noticias Destacadas</h2>
-            <div class="main-news-container">
-                <div id="noticia-principal" class="main-news-item"></div>
-                <div id="noticia-secundaria" class="secondary-news-item"></div>
+		<!--<section class="main-news-container">-->
+		<section class="main-news">
+		    <img src="imagen.jpg" alt="Título de la noticia">
+		    <div class="main-news-text">
+		        <h1>Título de la Noticia Principal</h1>
+		        <p>Breve descripción de la noticia principal.</p>
+		        <a href="enlace-a-la-noticia" target="_blank">Leer más</a>
+		    </div>
+		</section>
+		<!--</section>-->
+
+
+
+        <!-- Noticias Secundarias -->
+		
+        <section class="secondary-news">
+			<div class="title-section">
+								            <h2>Noticias Secundarias</h2>
+			</div>
+            <div class="secondary-news-container">
+                <div id="noticia-secundaria-1" class="secondary-news-item"></div>
+                <div id="noticia-secundaria-2" class="secondary-news-item"></div>
             </div>
         </section>
 
         <!-- Más Noticias -->
         <section>
-            <h2>Más Noticias</h2>
+			<div class="title-section">
+											            <h2>Más Noticias</h2>
+						</div>
+            
             <div id="noticias-lista" class="news-grid"></div>
         </section>
 
@@ -37,6 +91,7 @@
             </form>
         </section>
     </main>
+	
 
     <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
 }
