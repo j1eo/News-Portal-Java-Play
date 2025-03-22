@@ -12,6 +12,7 @@
 	   --background-color: #ececec;
 	   --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 	   --radius: 8px;
+	   
 
 /* General */
 body {
@@ -128,6 +129,41 @@ header h1 {
 	color: #fff;
 	background-color: var(--accent-color);
 		    border-color: #fff;
+}
+.nav-bar {
+    display: flex;
+    justify-content: center; /* Centra los botones horizontalmente */
+    align-items: center;
+    gap: 10px; /* Espaciado entre botones */
+    background-color: var(--background-color); /* Fondo del nav-bar (puedes personalizarlo) */
+    padding: 10px;
+    border-bottom: 2px solid var(--primary-color); /* Línea decorativa */
+	box-shadow: var(--box-shadow);
+}
+
+.nav-button {
+    background-color: var(--accent-color); /* Color primario */
+    color: white; /* Color del texto */
+    border: 2px solid var(--accent-color); /* Elimina bordes predeterminados */
+    border-radius: 5px; /* Bordes redondeados */
+    padding: 10px 20px; /* Tamaño del botón */
+	font-weight: bold;
+    font-family: 'Inter', sans-serif; /* Fuente personalizada */
+    font-size: 16px;
+    cursor: pointer; /* Cambia el cursor a una mano al pasar */
+    transition: all 0.3s ease; /* Transición suave */
+}
+
+.nav-button:hover {
+	color: var(--accent-color); /* Color del texto */
+	border: border: 2px solid white; 
+    background-color: white; /* Color al pasar el mouse */
+    transform: scale(1.05); /* Pequeño zoom en hover */
+}
+
+.nav-button:active {
+    background-color: var(--primary-hover); /* Color al hacer clic */
+    transform: scale(0.95); /* Efecto de clic */
 }
 
 /*Menu Lateral*/
