@@ -2,42 +2,29 @@ package models;
 
 import java.util.Date;
 
-public class Articulo {
-    private int idArticulo;
+public class NoticiaPropia {
+    private int idNoticia;
     private int idMiembro;
     private String titulo;
     private String autor;
-    private String contenido;
+    private String url;
+    private String fuente;
+    private String descripcion;
     private String imagen;
+    private String contenido;
     private Date fechaPublicacion;
     private String estado;
-    private String categoria;
+    private String categoria;  // Ej: 'DEPORTES', 'TECNOLOGÍA', etc.
     private int meGusta;
     private int noMeGusta;
 
-    // **Constructor completo**
-    public Articulo(int idArticulo, int idMiembro, String titulo, String autor, String contenido, String imagen, 
-                    Date fechaPublicacion, String estado, String categoria, int meGusta, int noMeGusta) {
-        this.idArticulo = idArticulo;
-        this.idMiembro = idMiembro;
-        this.titulo = titulo;
-        this.autor = autor;
-        this.contenido = contenido;
-        this.imagen = imagen;
-        this.fechaPublicacion = fechaPublicacion;
-        this.estado = estado;
-        this.categoria = categoria;
-        this.meGusta = meGusta;
-        this.noMeGusta = noMeGusta;
-    }
-
     // Getters y setters
-    public int getIdArticulo() {
-        return idArticulo;
+    public int getIdNoticia() {
+        return idNoticia;
     }
 
-    public void setIdArticulo(int idArticulo) {
-        this.idArticulo = idArticulo;
+    public void setIdNoticia(int idNoticia) {
+        this.idNoticia = idNoticia;
     }
 
     public int getIdMiembro() {
@@ -64,12 +51,28 @@ public class Articulo {
         this.autor = autor;
     }
 
-    public String getContenido() {
-        return contenido;
+    public String getUrl() {
+        return url;
     }
 
-    public void setContenido(String contenido) {
-        this.contenido = contenido;
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getFuente() {
+        return fuente;
+    }
+
+    public void setFuente(String fuente) {
+        this.fuente = fuente;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public String getImagen() {
@@ -78,6 +81,14 @@ public class Articulo {
 
     public void setImagen(String imagen) {
         this.imagen = imagen;
+    }
+
+    public String getContenido() {
+        return contenido;
+    }
+
+    public void setContenido(String contenido) {
+        this.contenido = contenido;
     }
 
     public Date getFechaPublicacion() {
@@ -120,3 +131,4 @@ public class Articulo {
         this.noMeGusta = noMeGusta;
     }
 }
+
