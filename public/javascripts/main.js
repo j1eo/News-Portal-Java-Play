@@ -81,17 +81,49 @@ function cargarNoticias() {
 // Funciones para cargar artículos
 function cargarArticulos() {
     fetch("/articulos")
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error en la respuesta del servidor");
+            }
+            return response.json();
+        })
         .then(data => {
             const lista = document.getElementById("articulos-lista");
             lista.innerHTML = "";
+
             data.forEach(articulo => {
                 const item = document.createElement("li");
-                item.innerHTML = `<strong>${articulo.titulo}</strong>: ${articulo.contenido} <em>(${new Date(articulo.fechaPublicacion).toLocaleDateString()})</em>`;
+                item.innerHTML = `
+                    <h3>${articulo.titulo}</h3>
+                    <p><strong>Autor:</strong> ${articulo.autor}</p>
+                    <p><strong>Categoría:</strong> ${articulo.categoria}</p>
+                    <p><strong>Estado:</strong> ${articulo.estado}</p>
+                    <p><strong>Contenido:</strong> ${articulo.contenido}</p>
+                    <p><strong>Fecha de publicación:</strong> ${new Date(articulo.fechaPublicacion).toLocaleDateString()}</p>
+                    <p><strong>Me gusta:</strong> ${articulo.meGusta} | <strong>No me gusta:</strong> ${articulo.noMeGusta}</p>
+                    ${articulo.imagen ? `<img src="${articulo.imagen}" alt="Imagen del artículo" style="max-width:300px;">` : ""}
+                    <br>
+                    <button onclick="eliminarArticulo(${articulo.idArticulo})">Eliminar</button>
+                `;
                 lista.appendChild(item);
             });
         })
         .catch(error => console.error("Error al cargar artículos:", error));
+}
+
+function eliminarArticulo(id) {
+    fetch(`/articulos/${id}`, { method: "DELETE" })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al eliminar el artículo");
+            }
+            return response.json();
+        })
+        .then(() => {
+            alert("Artículo eliminado correctamente");
+            cargarArticulos(); // Recargar la lista después de eliminar
+        })
+        .catch(error => console.error("Error al eliminar el artículo:", error));
 }
 
 // Función para agregar un artículo nuevo

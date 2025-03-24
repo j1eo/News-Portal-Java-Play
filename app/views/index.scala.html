@@ -1,50 +1,7 @@
 @(message: String)
 
-@main("UR NEWS -- Pagina Principal") {
+@main("UR NEWS -- Pagina Principal",message) {
 
-	<header>
-	    <div class="container">
-			
-			<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
-			           
-	        <div class="logo">
-	            <img src="/assets/images/LOGO.png" alt="Logo">
-	            <h1>@message</h1>
-	        </div>
-	        <div class="buttons">
-	            <button class="btn btn-primary">INICIAR SESION</button>  <!-- Botón principal -->
-	            <button class="btn btn-secondary">SUSCRIBETE</button> <!-- Botón secundario -->
-	        </div>
-	    </div>
-	</header>
-	<nav class="nav-bar">
-	    <button class="nav-button">NOTICIAS LOCALES</button>
-	    <button class="nav-button">NOTICIAS NACIONALES</button>
-	    <button class="nav-button">ARTICULOS</button>
-	    <button class="nav-button">MILENIO</button>
-	</nav>
-
-	
-	<div id="mySidenav" class="sidenav">
-	    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">X</a>
-	    <p>Descubre las últimas noticias</p>
-	    <div class="search-container">
-	        <input
-	            type="text"
-	            id="searchInput"
-	            class="search-bar"
-	            placeholder="Buscar..."
-	            oninput="filtrarResultados()" 
-	        />
-	    </div>
-	    <a href="#">Noticias Locales</a>
-	    <a href="#">Noticias Nacionales</a>
-	    <a href="#">Artículos</a>
-	    <a href="#">Preguntas Frecuentes</a>
-	</div>
-
-	
-	
     <main>
 		<div id="overlay"></div>
         <!-- Noticias Destacadas -->
@@ -83,21 +40,23 @@
         </section>
 
         <!-- Artículos Propios -->
-        <section>
-            <h2>Artículos Propios</h2>
-            <ul id="articulos-lista"></ul>
-        </section>
+		<section>
+		    <h2>Artículos Propios</h2>
+		    <ul id="articulos-lista"></ul>
+		</section>
 
-        <!-- Formulario para agregar artículos -->
-        <section>
-            <h2>Agregar un Artículo</h2>
-            <form id="form-articulo">
-                <input type="text" id="titulo" placeholder="Título" required>
-                <textarea id="contenido" placeholder="Contenido" required></textarea>
-                <button type="submit">Publicar</button>
-            </form>
-        </section>
-    </main>
+		<!-- Formulario para agregar artículos -->
+		<section>
+		    <h2>Agregar un Artículo</h2>
+		    <form id="form-articulo">
+		        <input type="text" id="titulo" placeholder="Título" required>
+		        <input type="text" id="autor" placeholder="Autor" required>
+		        <input type="text" id="categoria" placeholder="Categoría" required>
+		        <textarea id="contenido" placeholder="Contenido" required></textarea>
+		        <button type="submit">Publicar</button>
+		    </form>
+		</section>
+
 	
 
     <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
