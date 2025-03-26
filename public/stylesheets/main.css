@@ -331,3 +331,40 @@ form button {
 form button:hover {
     background-color: #555;
 }
+
+
+/* Botones generales */
+button.me-gusta-btn, button.no-me-gusta-btn {
+    font-size: 16px;
+    padding: 10px 20px;
+    margin: 5px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: white;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Hover para mejorar la experiencia del usuario */
+button.me-gusta-btn:hover {
+    background-color: #e0f7fa; /* Color suave para "Me gusta" */
+}
+
+button.no-me-gusta-btn:hover {
+    background-color: #fdecea; /* Color suave para "No me gusta" */
+}
+
+/* Botón activado (toggle ON) */
+button.me-gusta-btn.active {
+    background-color: #007BFF; /* Color azul para "Me gusta" activado */
+    color: white;
+    border-color: #0056b3;
+}
+
+button.no-me-gusta-btn.active {
+    background-color: #DC3545; /* Color rojo para "No me gusta" activado */
+    color: white;
+    border-color: #a71d2a;
+}
+

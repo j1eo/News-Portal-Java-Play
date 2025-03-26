@@ -78,7 +78,9 @@ function cargarNoticias() {
         .catch(error => console.error("Error al cargar noticias:", error));
 }
 
-// Funciones para cargar artículos
+// Simulación de registros por usuario
+let registroLikes = {};
+
 function cargarArticulos() {
     fetch("/articulos")
         .then(response => {
@@ -100,16 +102,72 @@ function cargarArticulos() {
                     <p><strong>Estado:</strong> ${articulo.estado}</p>
                     <p><strong>Contenido:</strong> ${articulo.contenido}</p>
                     <p><strong>Fecha de publicación:</strong> ${new Date(articulo.fechaPublicacion).toLocaleDateString()}</p>
-                    <p><strong>Me gusta:</strong> ${articulo.meGusta} | <strong>No me gusta:</strong> ${articulo.noMeGusta}</p>
+                    <p><strong>Me gusta:</strong> <span id="me-gusta-${articulo.idArticulo}">${articulo.meGusta}</span> |
+                       <strong>No me gusta:</strong> <span id="no-me-gusta-${articulo.idArticulo}">${articulo.noMeGusta}</span></p>
                     ${articulo.imagen ? `<img src="${articulo.imagen}" alt="Imagen del artículo" style="max-width:300px;">` : ""}
                     <br>
-                    <button onclick="eliminarArticulo(${articulo.idArticulo})">Eliminar</button>
+                    <button class="me-gusta-btn" onclick="toggleMeGusta(${articulo.idArticulo})">👍 Me gusta</button>
+                    <button class="no-me-gusta-btn" onclick="toggleNoMeGusta(${articulo.idArticulo})">👎 No me gusta</button>
                 `;
                 lista.appendChild(item);
+
+                // Inicializar registro de interacción por artículo
+                if (!registroLikes[articulo.idArticulo]) {
+                    registroLikes[articulo.idArticulo] = { meGusta: false, noMeGusta: false };
+                }
             });
         })
         .catch(error => console.error("Error al cargar artículos:", error));
 }
+
+// Función para toggle "Me gusta"
+function toggleMeGusta(idArticulo) {
+    const botonMeGusta = document.querySelector(`button[onclick="toggleMeGusta(${idArticulo})"]`);
+    const contadorMeGusta = document.getElementById(`me-gusta-${idArticulo}`);
+    const estado = registroLikes[idArticulo];
+
+    if (!estado.meGusta) {
+        // Activar "Me gusta"
+        contadorMeGusta.textContent = parseInt(contadorMeGusta.textContent) + 1;
+        estado.meGusta = true;
+        botonMeGusta.classList.add("active");
+
+        // Si ya tenía "No me gusta", lo desactiva
+        if (estado.noMeGusta) {
+            toggleNoMeGusta(idArticulo);
+        }
+    } else {
+        // Desactivar "Me gusta"
+        contadorMeGusta.textContent = parseInt(contadorMeGusta.textContent) - 1;
+        estado.meGusta = false;
+        botonMeGusta.classList.remove("active");
+    }
+}
+
+// Función para toggle "No me gusta"
+function toggleNoMeGusta(idArticulo) {
+    const botonNoMeGusta = document.querySelector(`button[onclick="toggleNoMeGusta(${idArticulo})"]`);
+    const contadorNoMeGusta = document.getElementById(`no-me-gusta-${idArticulo}`);
+    const estado = registroLikes[idArticulo];
+
+    if (!estado.noMeGusta) {
+        // Activar "No me gusta"
+        contadorNoMeGusta.textContent = parseInt(contadorNoMeGusta.textContent) + 1;
+        estado.noMeGusta = true;
+        botonNoMeGusta.classList.add("active");
+
+        // Si ya tenía "Me gusta", lo desactiva
+        if (estado.meGusta) {
+            toggleMeGusta(idArticulo);
+        }
+    } else {
+        // Desactivar "No me gusta"
+        contadorNoMeGusta.textContent = parseInt(contadorNoMeGusta.textContent) - 1;
+        estado.noMeGusta = false;
+        botonNoMeGusta.classList.remove("active");
+    }
+}
+
 
 function eliminarArticulo(id) {
     fetch(`/articulos/${id}`, { method: "DELETE" })
