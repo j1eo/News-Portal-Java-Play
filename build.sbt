@@ -15,8 +15,16 @@ libraryDependencies ++= Seq(
   javaJdbc,
   cache,
   javaWs,
-  "org.jsoup" % "jsoup" % "1.13.1" // Añade la dependencia de Jsoup
+  javaCore,
+  "org.hibernate" % "hibernate-entitymanager" % "5.1.0.Final",
+  "org.jsoup" % "jsoup" % "1.13.1",
+  "javax.xml.bind" % "jaxb-api" % "2.3.1",
+  "org.glassfish.jaxb" % "jaxb-runtime" % "2.3.1"
 )
+
+dependencyOverrides += "javax.xml.bind" % "jaxb-api" % "2.3.1"
+dependencyOverrides += "org.glassfish.jaxb" % "jaxb-runtime" % "2.3.1"
+
 
 // Configuración de Eclipse
 // Compila el proyecto antes de generar los archivos para Eclipse

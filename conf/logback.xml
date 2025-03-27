@@ -24,10 +24,31 @@
     <appender-ref ref="STDOUT" />
   </appender>
 
+  <!-- Configurar logs generales -->
   <logger name="play" level="INFO" />
   <logger name="application" level="DEBUG" />
 
-  <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
+  <!-- Logs detallados de Hibernate -->
+  <logger name="org.hibernate" level="DEBUG" />
+  <logger name="org.hibernate.cfg" level="DEBUG" />
+  <logger name="org.hibernate.tool.hbm2ddl" level="DEBUG" />
+  <logger name="org.hibernate.SQL" level="DEBUG" />
+  <logger name="org.hibernate.type.descriptor.sql" level="TRACE" />
+
+  <!-- Logs detallados de JPA -->
+  <logger name="javax.persistence" level="DEBUG" />
+
+  <!-- Logs de JAXB (para ver si está fallando la carga de clases) -->
+  <logger name="javax.xml.bind" level="DEBUG" />
+  <logger name="com.sun.xml.bind" level="DEBUG" />
+  <logger name="org.glassfish.jaxb" level="DEBUG" />
+
+  <!-- Mostrar problemas de carga de clases -->
+  <logger name="org.springframework.beans" level="DEBUG" />
+  <logger name="org.springframework.context" level="DEBUG" />
+  <logger name="org.springframework.core" level="DEBUG" />
+
+  <!-- Off estos logs que no son necesarios -->
   <logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />
   <logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader" level="OFF" />
   <logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread" level="OFF" />
