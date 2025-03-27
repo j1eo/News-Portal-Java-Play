@@ -1,0 +1,46 @@
+@(message: String)
+
+@bannerAuth("UR NEWS -- Login", message) {
+    <main>
+        <div class="login-wrapper">
+            <div class="login-form">
+                <h2 class="login-title">INICIA SESIÓN</h2>
+                
+                <form id="loginForm" method="POST">
+                    <div class="form-group">
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Usuario" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Contraseña" required minlength="8">
+                        <span class="password-hint">Utiliza mínimo 8 caracteres</span>
+                    </div>
+                    
+                    <button type="submit" class="login-btn">INGRESAR</button>
+                    
+                    <div class="login-links">
+                        <a href="#">¿Olvidaste tu contraseña?</a>
+                        <a href="#">¿Eres Staff?, ingresa aquí</a>
+                        <a href="#">Si no tienes usuario, registrate</a>
+                    </div>
+				<div class="register-btn-container">  <!-- Contenedor adicional para control preciso -->
+					    <a href="@routes.AuthController.register()" class="register-btn">Regístrate</a>
+				</div>
+                </form>
+                
+                <!-- Botón de registro como botón real -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Validación adicional antes de enviar
+            if(this.checkValidity()) {
+                this.submit(); // Envía el formulario si es válido
+            }
+        });
+		
+    </script>
+}

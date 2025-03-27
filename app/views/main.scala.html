@@ -14,17 +14,19 @@
         <header>
             <div class="container">
                 <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
-                <div class="logo">
-                    <img src="/assets/images/LOGO.png" alt="Logo">
-                    <h1>@message</h1>
-                </div>
+				<a href="@routes.HomeController.index()" class="logo-link">
+								    <div class="logo">
+								        <img src="/assets/images/LOGO.png" alt="Logo">
+								        <h1>@message</h1>
+								    </div>
+								</a> 
                 <div class="buttons">
-                    <button class="btn btn-primary">INICIAR SESIÓN</button>
+                    <a href="@routes.AuthController.login()" class="btn btn-primary">INICIAR SESIÓN</a>
                     <button class="btn btn-secondary">SUSCRÍBETE</button>
                 </div>
             </div>
         </header>
-        <nav class="nav-bar">
+        <nav class="nav-bar">	
             <button class="nav-button">NOTICIAS LOCALES</button>
             <button class="nav-button">NOTICIAS NACIONALES</button>
             <button class="nav-button">ARTÍCULOS</button>

@@ -367,4 +367,220 @@ button.no-me-gusta-btn.active {
     color: white;
     border-color: #a71d2a;
 }
+/* Añade esto al final de tu archivo CSS existente */
+
+/* ------------------------- */
+/* ESTILOS ESPECÍFICOS LOGIN */
+/* ------------------------- */
+
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    min-height: 60vh;
+	font-family: 'Unbounded', sans-serif;
+}
+
+.login-form {
+    background-color: var(--primary-color);
+    padding: 2.5rem;
+    border-radius: var(--radius);
+    box-shadow: var(--box-shadow);
+    width: 100%;
+    max-width: 400px;
+    border: 3px solid var(--accent-color);
+}
+
+.login-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1.8rem;
+    color: white;
+   font-family: 'Unbounded', sans-serif !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+	text-shadow: 
+	     -1px -1px 0 var(--accent-color),  /* Top-left shadow */
+	      1px -1px 0 var(--accent-color),  /* Top-right shadow */
+	     -1px  1px 0 var(--accent-color),  /* Bottom-left shadow */
+	      1px  1px 0 var(--accent-color);  /* Bottom-right shadow */
+}
+
+.form-group {
+    margin-bottom: 1.8rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+    color: white;
+    font-family: 'Inter', sans-serif;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.9rem;
+    border: 2px solid #444;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    box-sizing: border-box;
+    background-color: #333;
+    color: white;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(94, 54, 184, 0.3);
+}
+
+.form-control::placeholder {
+   color: white; 
+}
+
+.form-control:focus {
+    background-color: rgba(255, 255, 255, 0.4); /* Fondo más visible al interactuar */
+    border-color: white; /* Resalta el borde */
+	color: #ddd; /* Texto blanco */
+}
+.form-control:focus::placeholder {
+    color: var(--primary-color); /* Cambia este color por el que prefieras */
+}
+.password-hint {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-top: 0.5rem;
+    display: block;
+    font-family: 'Inter', sans-serif;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+    font-family: 'Unbounded', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.login-btn:hover {
+    background-color: #7a52d1;
+    transform: translateY(-2px);
+}
+
+.login-links {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.login-links a {
+    color: #aaa;
+    text-decoration: none;
+    display: block;
+    margin: 0.8rem 0;
+    transition: color 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.login-links a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.register-btn {
+	width: 100%;
+	            padding: 0.75rem;
+	            background-color: var(--accent-color);
+	            color: white;
+	            border: none;
+	            border-radius: var(--radius);
+	            font-size: 1rem;
+	            font-weight: 600;
+	            cursor: pointer;
+	            margin-top: 0.5rem;
+	  transition: all 0.3s ease;
+	  font-family: 'Unbounded', sans-serif;
+	  text-transform: uppercase;
+	  letter-spacing: 1px;
+}
+
+.register-btn:hover {
+	background-color: #7a52d1;
+	    transform: translateY(-2px);
+}
+
+.alert-error {
+    color: #ff6b6b;
+    background-color: rgba(40, 20, 20, 0.8);
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.8rem;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    border: 1px solid #ff6b6b;
+}
+.logo-link {
+       display: flex;        /* Usa flexbox */
+       align-items: center;  /* Centra verticalmente */
+       gap: 10px;           /* Espacio entre elementos */
+       text-decoration: none;
+       color: inherit;
+       padding: 0;
+       margin: 0;
+   }
+   .register-btn-container {
+       width: 100%;  /* Ocupa todo el ancho disponible */
+       margin-top: 0.5rem;  /* Conserva el margen superior original */
+       text-align: center;  /* Centra el contenido (opcional) */
+   }
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-form {
+        padding: 1.8rem;
+        margin: 1rem auto;
+    }
+    
+    .login-wrapper {
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .login-title {
+        font-size: 1.5rem;
+    }
+    
+    .form-control {
+        padding: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-form {
+        padding: 1.5rem;
+    }
+    
+    .login-title {
+        font-size: 1.3rem;
+    }
+    
+    .login-btn, .register-btn {
+        padding: 0.9rem;
+        font-size: 1rem;
+    }
+}
 

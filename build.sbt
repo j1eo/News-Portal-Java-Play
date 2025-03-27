@@ -15,6 +15,9 @@ libraryDependencies ++= Seq(
   javaJdbc,
   cache,
   javaWs,
+  javaJpa,
+  evolutions,
+  "org.mindrot" % "jbcrypt" % "0.4",
   "org.jsoup" % "jsoup" % "1.13.1" // Añade la dependencia de Jsoup
 )
 
