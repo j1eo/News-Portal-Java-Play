@@ -1,7 +1,11 @@
 # Definición de rutas para el portal de noticias
 GET     /       controllers.HomeController.index
-GET     /login              controllers.AuthController.login()
+
 GET     /register           controllers.AuthController.register()
+GET     /login                      controllers.AuthController.login()
+POST    /login                      controllers.AuthController.autenticar()
+GET   /auth/crearUsuarioPrueba   controllers.AuthController.crearUsuarioPrueba
+POST  /auth/registrar   controllers.AuthController.registrarUsuario
 
 # Obtener noticias externas
 GET     /noticias              controllers.NoticiasController.obtenerNoticias

@@ -1,37 +1,45 @@
 @(message: String)
 
 @bannerAuth("UR NEWS -- Login", message) {
-    <main>
-        <div class="login-wrapper">
-            <div class="login-form">
-                <h2 class="login-title">INICIA SESIÓN</h2>
-                
-                <form id="loginForm" method="POST">
-                    <div class="form-group">
-                        <input type="text" id="username" name="username" class="form-control" placeholder="Usuario" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Contraseña" required minlength="8">
-                        <span class="password-hint">Utiliza mínimo 8 caracteres</span>
-                    </div>
-                    
-                    <button type="submit" class="login-btn">INGRESAR</button>
-                    
-                    <div class="login-links">
-                        <a href="#">¿Olvidaste tu contraseña?</a>
-                        <a href="#">¿Eres Staff?, ingresa aquí</a>
-                        <a href="#">Si no tienes usuario, registrate</a>
-                    </div>
-				<div class="register-btn-container">  <!-- Contenedor adicional para control preciso -->
-					    <a href="@routes.AuthController.register()" class="register-btn">Regístrate</a>
-				</div>
-                </form>
-                
-                <!-- Botón de registro como botón real -->
-            </div>
-        </div>
-    </main>
+	<main>
+	        <div class="login-wrapper">
+	            @if(flash.containsKey("error")) {
+	                <div class="alert alert-error">@flash.get("error")</div>
+	            }
+	            @if(flash.containsKey("success")) {
+	                <div class="alert alert-success">@flash.get("success")</div>
+	            }
+	            
+	            <div class="login-form">
+	                <h2 class="login-title">INICIA SESIÓN</h2>
+	                
+	                <form action="@routes.AuthController.autenticar()" method="POST">
+	                    <div class="form-group">
+	                        <input type="text" name="username" class="form-control" 
+	                               placeholder="Usuario o Email" required>
+	                    </div>
+	                    
+	                    <div class="form-group">
+	                        <input type="password" name="password" class="form-control" 
+	                               placeholder="Contraseña" required minlength="8">
+	                        <span class="password-hint">Utiliza mínimo 8 caracteres</span>
+	                    </div>
+	                    
+	                    <button type="submit" class="login-btn">INGRESAR</button>
+	                    
+	                    <div class="login-links">
+	                        <a href="#">¿Olvidaste tu contraseña?</a>
+	                        <a href="@routes.AuthController.register()">¿Eres Staff?, ingresa aquí</a>
+	                        <a href="@routes.AuthController.register()">Si no tienes usuario, regístrate</a>
+	                    </div>
+	                </form>
+	                
+	                <div class="register-btn-container">
+	                    <a href="@routes.AuthController.register()" class="register-btn">Regístrate</a>
+	                </div>
+	            </div>
+	        </div>
+	    </main>
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', function(e) {
