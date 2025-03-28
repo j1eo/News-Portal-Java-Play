@@ -1,9 +1,11 @@
 package services;
 
 import dataBase.DB_Connection;
+import models.*;
 import org.mindrot.jbcrypt.BCrypt;
 import javax.inject.Inject;
 import java.sql.*;
+import java.util.Date;
 
 public class AuthService {
     private final DB_Connection dbConnection;
@@ -13,8 +15,15 @@ public class AuthService {
         this.dbConnection = dbConnection;
     }
 
-    public String autenticarUsuario(String username, String password) throws SQLException {
-        String sql = "SELECT Nickname, Clave_Acceso FROM Cuenta WHERE Nickname = ? OR Email = ?";
+    /**
+     * Autentica un usuario usando nickname/email y contraseña
+     */
+    public Cuenta autenticarUsuario(String username, String password) throws SQLException {
+        String sql = "SELECT c.*, a.ID_Admin, u.ID_Usuario, u.Suscripcion " +
+                     "FROM Cuenta c " +
+                     "LEFT JOIN Administrador a ON c.ID_Cuenta = a.ID_Cuenta " +
+                     "LEFT JOIN Usuario u ON c.ID_Cuenta = u.ID_Cuenta " +
+                     "WHERE c.Nickname = ? OR c.Email = ?";
         
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -24,62 +33,254 @@ public class AuthService {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next() && BCrypt.checkpw(password, rs.getString("Clave_Acceso"))) {
-                return rs.getString("Nickname");
+                return mapearCuentaDesdeResultSet(rs);
             }
             return null;
         }
     }
 
-    public boolean registrarUsuario(String nombre, String apellidos, String nickname, 
-                                  String email, String password) throws SQLException {
-        if (existeUsuario(nickname, email)) {
-            return false;
-        }
+    /**
+     * Registra una nueva cuenta completa (en tabla Cuenta y su tabla específica)
+     */
+    public Cuenta registrarCuentaCompleta(String nombre, String apellidos, String nickname, 
+                                        String email, String password, boolean esAdmin, 
+                                        String suscripcion) throws SQLException {
+        Connection conn = null;
+        try {
+            conn = dbConnection.getConnection();
+            conn.setAutoCommit(false); // Iniciar transacción
 
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-        String sql = "INSERT INTO Cuenta (Nombre, Apellidos, Nickname, Email, Clave_Acceso) VALUES (?, ?, ?, ?, ?)";
+            // Validar que no exista el usuario
+            if (existeUsuario(conn, nickname, email)) {
+                throw new SQLException("El usuario o email ya están registrados");
+            }
 
-        try (Connection conn = dbConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // 1. Registrar en tabla Cuenta
+            int idCuenta = insertarCuenta(conn, nombre, apellidos, nickname, email, password);
             
-            stmt.setString(1, nombre);
-            stmt.setString(2, apellidos);
-            stmt.setString(3, nickname);
-            stmt.setString(4, email);
-            stmt.setString(5, hashedPassword);
+            // 2. Registrar en tabla específica
+            Cuenta cuenta;
+            if (esAdmin) {
+                int idAdmin = insertarAdmin(conn, idCuenta);
+                Admin admin = new Admin();
+                admin.setIdAdmin(idAdmin);
+                cuenta = admin;
+            } else {
+                int idUsuario = insertarUsuario(conn, idCuenta, suscripcion != null ? suscripcion : "BASICA");
+                Usuario usuario = new Usuario();
+                usuario.setIdUsuario(idUsuario);
+                usuario.setSuscripcion(suscripcion);
+                cuenta = usuario;
+            }
             
-            return stmt.executeUpdate() > 0;
+            // Setear datos comunes
+            setDatosCuenta(cuenta, idCuenta, nombre, apellidos, nickname, email, password);
+            
+            conn.commit(); // Confirmar transacción
+            return cuenta;
+            
+        } catch (SQLException e) {
+            if (conn != null) conn.rollback();
+            throw e;
+        } finally {
+            if (conn != null) conn.setAutoCommit(true);
         }
     }
 
-    private boolean existeUsuario(String nickname, String email) throws SQLException {
-        String sql = "SELECT 1 FROM Cuenta WHERE Nickname = ? OR Email = ?";
-        
+    /**
+     * Obtiene el rol de un usuario (admin/user)
+     */
+    public String obtenerRolUsuario(int idCuenta) throws SQLException {
+        String sql = "SELECT 1 FROM Administrador WHERE ID_Cuenta = ?";
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+            stmt.setInt(1, idCuenta);
+            return stmt.executeQuery().next() ? "admin" : "user";
+        }
+    }
+
+    /**
+     * Verifica si un usuario existe
+     */
+    public boolean existeUsuario(String nickname, String email) throws SQLException {
+        try (Connection conn = dbConnection.getConnection()) {
+            return existeUsuario(conn, nickname, email);
+        }
+    }
+
+    /**
+     * Crea usuarios de prueba (admin, normal y premium)
+     */
+    public void crearUsuariosDePrueba() throws SQLException {
+        // Admin
+        if (!existeUsuario("admin", "admin@example.com")) {
+            registrarCuentaCompleta(
+                "Admin", "Sistema", "admin", 
+                "admin@example.com", "Admin123", true, null
+            );
+        }
+        
+        // Usuario normal
+        if (!existeUsuario("usuario", "usuario@example.com")) {
+            registrarCuentaCompleta(
+                "Usuario", "Normal", "usuario", 
+                "usuario@example.com", "Usuario123", false, "BASICA"
+            );
+        }
+        
+        // Usuario premium
+        if (!existeUsuario("premium", "premium@example.com")) {
+            registrarCuentaCompleta(
+                "Premium", "Usuario", "premium", 
+                "premium@example.com", "Premium123", false, "PREMIUM"
+            );
+        }
+    }
+
+    /**
+     * Registra un intento de login en la tabla Login
+     */
+    public void registrarIntentoLogin(int idCuenta, String ip) throws SQLException {
+        String sql = "INSERT INTO Login (ID_Cuenta, Fecha_Hora, IP) VALUES (?, CURRENT_TIMESTAMP, ?)";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idCuenta);
+            stmt.setString(2, ip);
+            stmt.executeUpdate();
+        }
+    }
+
+    // --- Métodos privados auxiliares ---
+
+    private Cuenta mapearCuentaDesdeResultSet(ResultSet rs) throws SQLException {
+        Cuenta cuenta;
+        
+        if (rs.getObject("ID_Admin") != null) {
+            Admin admin = new Admin();
+            admin.setIdAdmin(rs.getInt("ID_Admin"));
+            cuenta = admin;
+        } else {
+            Usuario usuario = new Usuario();
+            usuario.setIdUsuario(rs.getInt("ID_Usuario"));
+            usuario.setSuscripcion(rs.getString("Suscripcion"));
+            cuenta = usuario;
+        }
+        
+        // Campos comunes
+        setDatosCuentaDesdeResultSet(cuenta, rs);
+        
+        return cuenta;
+    }
+
+    private void setDatosCuenta(Cuenta cuenta, int idCuenta, String nombre, String apellidos, 
+                              String nickname, String email, String password) {
+        cuenta.setIdCuenta(idCuenta);
+        cuenta.setNombre(nombre);
+        cuenta.setApellidos(apellidos);
+        cuenta.setNickname(nickname);
+        cuenta.setEmail(email);
+        cuenta.setClaveAcceso(BCrypt.hashpw(password, BCrypt.gensalt()));
+        cuenta.setFechaRegistro(new Date());
+    }
+
+    private void setDatosCuentaDesdeResultSet(Cuenta cuenta, ResultSet rs) throws SQLException {
+        cuenta.setIdCuenta(rs.getInt("ID_Cuenta"));
+        cuenta.setNombre(rs.getString("Nombre"));
+        cuenta.setApellidos(rs.getString("Apellidos"));
+        cuenta.setNickname(rs.getString("Nickname"));
+        cuenta.setEmail(rs.getString("Email"));
+        cuenta.setClaveAcceso(rs.getString("Clave_Acceso"));
+        cuenta.setFechaRegistro(rs.getDate("Fecha_Registro"));
+        cuenta.setFotoPerfil(rs.getString("Foto_Perfil"));
+    }
+
+    private boolean existeUsuario(Connection conn, String nickname, String email) throws SQLException {
+        String sql = "SELECT 1 FROM Cuenta WHERE Nickname = ? OR Email = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nickname);
             stmt.setString(2, email);
             return stmt.executeQuery().next();
         }
     }
-    public void crearUsuarioPrueba() {
-        String nombre = "Usuario";
-        String apellidos = "De Prueba";
-        String nickname = "testuser";
-        String email = "testuser@example.com";
-        String password = "TestPassword123"; // Asegúrate de cambiarlo después
 
-        try {
-            if (registrarUsuario(nombre, apellidos, nickname, email, password)) {
-                System.out.println("Usuario de prueba creado exitosamente.");
-            } else {
-                System.out.println("No se pudo crear el usuario de prueba. Puede que ya exista.");
+    private int insertarCuenta(Connection conn, String nombre, String apellidos, 
+                             String nickname, String email, String password) throws SQLException {
+        String sql = "INSERT INTO Cuenta (Nombre, Apellidos, Nickname, Email, Clave_Acceso, Fecha_Registro) " +
+                     "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
+        
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, nombre);
+            stmt.setString(2, apellidos);
+            stmt.setString(3, nickname);
+            stmt.setString(4, email);
+            stmt.setString(5, BCrypt.hashpw(password, BCrypt.gensalt()));
+            
+            stmt.executeUpdate();
+            
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) return rs.getInt(1);
+                throw new SQLException("No se pudo obtener el ID de la cuenta");
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
-    
+    private int insertarAdmin(Connection conn, int idCuenta) throws SQLException {
+        String sql = "INSERT INTO Administrador (ID_Cuenta) VALUES (?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, idCuenta);
+            stmt.executeUpdate();
+            
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) return rs.getInt(1);
+                throw new SQLException("No se pudo obtener el ID de administrador");
+            }
+        }
+    }
+
+    private int insertarUsuario(Connection conn, int idCuenta, String suscripcion) throws SQLException {
+        String sql = "INSERT INTO Usuario (ID_Cuenta, Suscripcion) VALUES (?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, idCuenta);
+            stmt.setString(2, suscripcion);
+            stmt.executeUpdate();
+            
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) return rs.getInt(1);
+                throw new SQLException("No se pudo obtener el ID de usuario");
+            }
+        }
+    }
+ // Añade estos métodos a tu AuthService existente
+    public Cuenta getCuentaById(int idCuenta) throws SQLException {
+        String sql = "SELECT c.*, a.ID_Admin, u.ID_Usuario, u.Suscripcion " +
+                   "FROM Cuenta c " +
+                   "LEFT JOIN Administrador a ON c.ID_Cuenta = a.ID_Cuenta " +
+                   "LEFT JOIN Usuario u ON c.ID_Cuenta = u.ID_Cuenta " +
+                   "WHERE c.ID_Cuenta = ?";
+        
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, idCuenta);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next() ? mapearCuentaDesdeResultSet(rs) : null;
+        }
+    }
+
+    public int contarUsuarios() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Usuario";
+        try (Connection conn = dbConnection.getConnection();
+             Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
+
+    public int contarAdmins() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Administrador";
+        try (Connection conn = dbConnection.getConnection();
+             Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
 }
