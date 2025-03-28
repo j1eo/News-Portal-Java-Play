@@ -1,0 +1,127 @@
+@(usuario: models.Usuario, message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
+
+@main("Panel de Usuario", message) {
+	
+	<main>
+    <div class="user-dashboard-container">
+        <!-- Barra superior con información de usuario -->
+        <div class="user-header">
+            <div class="user-greeting">
+                <i class="fas fa-user-circle"></i>
+                <span>Bienvenido, <strong>@usuario.getNombre()</strong></span>
+            </div>
+			<a href="@routes.AuthController.logout()" class="logout-btn" onclick="confirmLogout()">
+			    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+			</a>
+        </div>
+
+        <!-- Contenido principal del dashboard -->
+        <div class="dashboard-content">
+            <div class="user-card">
+                <div class="user-avatar">
+                    <img src="@routes.Assets.versioned("images/favicon.png")" alt="Avatar de @usuario.getNombre()">
+                </div>
+                <div class="user-info">
+                    <h3>@usuario.getNombre() @usuario.getApellidos()</h3>
+                    <p><i class="fas fa-envelope"></i> @usuario.getEmail()</p>
+                    <p><i class="fas fa-star"></i> Suscripción: @usuario.getSuscripcion()</p>
+                </div>
+            </div>
+
+            <div class="dashboard-actions">
+                <a href="@routes.UserController.dashboard()" class="action-btn">
+                    <i class="fas fa-user-edit"></i> Editar perfil
+                </a>
+                <a href="@routes.NoticiasController.obtenerNoticias()" class="action-btn">
+                    <i class="fas fa-newspaper"></i> Ver noticias
+                </a>
+                <a href="@routes.ArticulosController.obtenerArticulos()" class="action-btn">
+                    <i class="fas fa-book"></i> Artículos guardados
+                </a>
+            </div>
+        </div>
+    </div>
+	
+	<div id="overlay"></div>
+	        <!-- Noticias Destacadas -->
+			<!--<section class="main-news-container">-->
+			<section class="main-news">
+			    <img href="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Título de la noticia">
+			    <div class="main-news-text">
+			        <h1>Título de la Noticia Principal</h1>
+			        <p>Breve descripción de la noticia principal.</p>
+			        <a href="enlace-a-la-noticia" target="_blank">Leer más</a>
+			    </div>
+			</section>
+			<!--</section>-->
+
+
+
+	        <!-- Noticias Secundarias -->
+			
+	        <section class="secondary-news">
+				<div class="title-section">
+									            <h2>Noticias Secundarias</h2>
+				</div>
+	            <div class="secondary-news-container">
+	                <div id="noticia-secundaria-1" class="secondary-news-item"></div>
+	                <div id="noticia-secundaria-2" class="secondary-news-item"></div>
+	            </div>
+	        </section>
+
+	        <!-- Más Noticias -->
+	        <section>
+				<div class="title-section">
+												            <h2>Más Noticias</h2>
+							</div>
+	            
+	            <div id="noticias-lista" class="news-grid"></div>
+	        </section>
+
+	        <!-- Artículos Propios -->
+			<section>
+			    <h2>Artículos Propios</h2>
+			    <ul id="articulos-lista"></ul>
+			</section>
+
+			<!-- Formulario para agregar artículos -->
+			<section>
+			    <h2>Agregar un Artículo</h2>
+			    <form id="form-articulo">
+			        <input type="text" id="titulo" placeholder="Título" required>
+			        <input type="text" id="autor" placeholder="Autor" required>
+			        <input type="text" id="categoria" placeholder="Categoría" required>
+			        <textarea id="contenido" placeholder="Contenido" required></textarea>
+					<input type="text" id="imagen" placeholder="URL de Imagen">
+			        <button type="submit">Publicar</button>
+			    </form>
+			</section>
+</main>
+<script src="@routes.Assets.versioned("javascripts/main.js")"></script>
+
+<script>
+// Añade este script para manejar mejor el cierre de sesión
+function confirmLogout() {
+    if(confirm("¿Estás seguro que deseas cerrar sesión?")) {
+        // Opcional: Hacer una llamada AJAX para limpieza adicional
+        fetch('@routes.AuthController.logout()', {
+            method: 'GET',
+            credentials: 'same-origin' // Incluye cookies
+        }).then(() => {
+            window.location.href = '@routes.HomeController.index()';
+        });
+        return true;
+    }
+    return false;
+}
+
+// Evita que el navegador cacheé la página al usar el botón "Atrás"
+window.onpageshow = function(event) {
+    if (event.persisted) {  // Si la página viene del cache
+        window.location.reload();  // Fuerza una recarga
+    }
+};
+
+</script>
+  
+}

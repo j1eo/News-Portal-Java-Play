@@ -1,14 +1,21 @@
-@(message: String)
+@(message: String, successMsg: String = null, errorMsg: String = null)
 
 @bannerAuth("UR NEWS -- Login", message) {
 	<main>
+		@if(errorMsg != null) {
+		           <div class="alert alert-error">
+		               @errorMsg
+		           </div>
+		           <script>console.error("Error: @errorMsg");</script>
+		       }
+		       
+		       @if(successMsg != null) {
+		           <div class="alert alert-success">
+		               @successMsg
+		           </div>
+		           <script>console.log("Éxito: @successMsg");</script>
+		       }
 	        <div class="login-wrapper">
-	            @if(flash.containsKey("error")) {
-	                <div class="alert alert-error">@flash.get("error")</div>
-	            }
-	            @if(flash.containsKey("success")) {
-	                <div class="alert alert-success">@flash.get("success")</div>
-	            }
 	            
 	            <div class="login-form">
 	                <h2 class="login-title">INICIA SESIÓN</h2>
