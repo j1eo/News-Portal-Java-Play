@@ -548,6 +548,19 @@ button.no-me-gusta-btn.active {
        margin-top: 0.5rem;  /* Conserva el margen superior original */
        text-align: center;  /* Centra el contenido (opcional) */
    }
+   .alert {
+       padding: 15px;
+       margin: 10px 0;
+       border-radius: 4px;
+   }
+   .alert-success {
+       background: #dff0d8;
+       color: #3c763d;
+   }
+   .alert-error {
+       background: #f2dede;
+       color: #a94442;
+   }
 /* Responsive Design */
 @media (max-width: 768px) {
     .login-form {
