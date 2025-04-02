@@ -5,6 +5,8 @@ import services.*;
 import models.*;
 import javax.inject.Inject;
 import views.html.*;
+import java.util.List;
+import java.sql.SQLException;
 
 public class UserController extends Controller {
     
@@ -13,6 +15,9 @@ public class UserController extends Controller {
     
     @Inject
     private AuthService authService;
+    
+    @Inject
+    private ArticuloService articuloService;
 
     public Result dashboard() {
         // 1. Verificar cookie
@@ -32,11 +37,19 @@ public class UserController extends Controller {
                 return redirect(routes.AuthController.login());
             }
 
-            // 3. Obtener datos del usuario
+            // 3. Obtener datos del usuario y artículos
             String userId = jwtService.obtenerSubject(token);
             Usuario usuario = (Usuario) authService.getCuentaById(Integer.parseInt(userId));
             
-            return ok(views.html.user.dashboard.render(usuario, "UR NEWS", request()));
+            // Obtener artículos publicados
+            List<Articulo> articulosPublicados = articuloService.obtenerArticulos();
+            
+            return ok(views.html.user.dashboard.render(
+                usuario, 
+                articulosPublicados,
+                "UR NEWS", 
+                request()
+            ));
 
         } catch (Exception e) {
             flash("error", "Error al cargar datos");
@@ -51,20 +64,23 @@ public class UserController extends Controller {
             return redirect(routes.AuthController.login());
         }
         
-        // 2. Obtener usuario
+        // 2. Obtener usuario y sus artículos
         try {
             String token = jwtCookie.value();
             String userId = jwtService.obtenerSubject(token);
             Usuario usuario = (Usuario) authService.getCuentaById(Integer.parseInt(userId));
             
-            // 3. Renderizar vista
-
-            return ok(views.html.user.dashboard.render(usuario, "UR NEWS", request()));
+            // Obtener artículos del usuario
+            List<Articulo> articulosUsuario = articuloService.obtenerArticulosPorUsuario(usuario.getIdUsuario());
+            
+            return ok(views.html.user.dashboard.render(
+                usuario,
+                articulosUsuario,
+                "UR NEWS",
+                request()
+            ));
         } catch (Exception e) {
             return redirect(routes.AuthController.login());
         }
     }
-
-
-   
 }
