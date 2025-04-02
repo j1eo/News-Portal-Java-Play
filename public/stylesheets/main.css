@@ -139,6 +139,7 @@ header h1 {
     padding: 10px;
     border-bottom: 2px solid var(--primary-color); /* Línea decorativa */
 	box-shadow: var(--box-shadow);
+	margin-bottom: 1rem;
 }
 
 .nav-button {
