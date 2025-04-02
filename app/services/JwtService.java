@@ -5,6 +5,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.auth0.jwt.interfaces.Claim;
+
 import java.util.Date;
 
 public class JwtService {
@@ -45,6 +47,14 @@ public class JwtService {
     public String obtenerUserRole(String token) {
         try {
             return JWT.require(ALGORITHM).build().verify(token).getClaim("role").asString();
+        } catch (JWTVerificationException e) {
+            return null;
+        }
+    }
+    public String obtenerClaim(String token, String claimName) {
+        try {
+            Claim claim = JWT.require(ALGORITHM).build().verify(token).getClaim(claimName);
+            return claim != null ? claim.asString() : null;
         } catch (JWTVerificationException e) {
             return null;
         }
