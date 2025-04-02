@@ -6,15 +6,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import models.Noticia;
+import javax.inject.Inject;
 
 public class NoticiasController extends Controller {
 
     private final NoticiaService noticiaService;
 
-    public NoticiasController() {
-        this.noticiaService = new NoticiaService();
+    @Inject  // Ahora usa inyección de dependencias
+    public NoticiasController(NoticiaService noticiaService) {
+        this.noticiaService = noticiaService;
     }
 
+    // Endpoint JSON original para API
     public Result obtenerNoticias() {
         try {
             List<Noticia> noticias = noticiaService.obtenerNoticias();
