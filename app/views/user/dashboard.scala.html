@@ -1,127 +1,163 @@
-@(usuario: models.Usuario, message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
+@(usuario: models.Usuario, articulosPublicados: List[models.Articulo], message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
 
-@main("Panel de Usuario", message) {
-	
-	<main>
-    <div class="user-dashboard-container">
-        <!-- Barra superior con información de usuario -->
-        <div class="user-header">
-            <div class="user-greeting">
-                <i class="fas fa-user-circle"></i>
-                <span>Bienvenido, <strong>@usuario.getNombre()</strong></span>
-            </div>
-			<a href="@routes.AuthController.logout()" class="logout-btn" onclick="confirmLogout()">
-			    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
-			</a>
-        </div>
-
-        <!-- Contenido principal del dashboard -->
-        <div class="dashboard-content">
-            <div class="user-card">
-                <div class="user-avatar">
-                    <img src="@routes.Assets.versioned("images/favicon.png")" alt="Avatar de @usuario.getNombre()">
+@userbanner("Panel de Usuario", message) {
+    
+    <main class="dashboard-main">
+        <div class="user-dashboard-container">
+            <!-- Barra superior con información de usuario -->
+            <div class="user-header">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Bienvenido, <strong>@usuario.getNombre()</strong></span>
                 </div>
-                <div class="user-info">
-                    <h3>@usuario.getNombre() @usuario.getApellidos()</h3>
-                    <p><i class="fas fa-envelope"></i> @usuario.getEmail()</p>
-                    <p><i class="fas fa-star"></i> Suscripción: @usuario.getSuscripcion()</p>
-                </div>
+                <a href="@routes.AuthController.logout()" class="logout-btn" onclick="return confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </a>
             </div>
 
-            <div class="dashboard-actions">
-                <a href="@routes.UserController.dashboard()" class="action-btn">
-                    <i class="fas fa-user-edit"></i> Editar perfil
-                </a>
-                <a href="@routes.NoticiasController.obtenerNoticias()" class="action-btn">
-                    <i class="fas fa-newspaper"></i> Ver noticias
-                </a>
-                <a href="@routes.ArticulosController.obtenerArticulos()" class="action-btn">
-                    <i class="fas fa-book"></i> Artículos guardados
-                </a>
+            <!-- Contenido principal -->
+            <div class="dashboard-main-content">
+                <!-- Sección de perfil -->
+                <div class="profile-section">
+                    <div class="user-card">
+                        <div class="user-avatar">
+                            <img src="@routes.Assets.versioned("images/favicon.png")" alt="Avatar">
+                        </div>
+                        <div class="user-info">
+                            <h3>@usuario.getNombre() @usuario.getApellidos()</h3>
+                            <p><i class="fas fa-envelope"></i> @usuario.getEmail()</p>
+                            <p><i class="fas fa-star"></i> Suscripción: @usuario.getSuscripcion()</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-actions">
+                        <a href="@routes.UserController.dashboard()" class="action-btn">
+                            <i class="fas fa-user-edit"></i> Editar perfil
+                        </a>
+                        <a href="@routes.NoticiasController.obtenerNoticias()" class="action-btn">
+                            <i class="fas fa-newspaper"></i> Ver noticias
+                        </a>
+                        <a href="@routes.ArticulosController.listarArticulos()" class="action-btn">
+                            <i class="fas fa-book"></i> Artículos guardados
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sección central de contenido -->
+                <div class="content-section">
+                    <!-- Noticias Destacadas -->
+                    <section class="main-news">
+                        <img src="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Título de la noticia">
+                        <div class="main-news-text">
+                            <h1>Título de la Noticia Principal</h1>
+                            <p>Breve descripción de la noticia principal.</p>
+                            <a href="enlace-a-la-noticia" target="_blank">Leer más</a>
+                        </div>
+                    </section>
+
+                    <!-- Noticias Secundarias -->
+                    <section class="secondary-news">
+                        <div class="title-section">
+                            <h2>Noticias Secundarias</h2>
+                        </div>
+                        <div class="secondary-news-container">
+                            <div id="noticia-secundaria-1" class="secondary-news-item"></div>
+                            <div id="noticia-secundaria-2" class="secondary-news-item"></div>
+                        </div>
+                    </section>
+
+                    <!-- Más Noticias -->
+                    <section class="more-news">
+                        <div class="title-section">
+                            <h2>Más Noticias</h2>
+                        </div>
+                        <div id="noticias-lista" class="news-grid"></div>
+                    </section>
+                </div>
+
+                <!-- Sidebar de artículos -->
+                <aside class="articles-sidebar">
+                    <section class="sidebar-section">
+                        <div class="sidebar-header">
+                            <h2>Artículos Publicados</h2>
+                            <button class="btn-filter" id="filter-articles">
+                                <i class="fas fa-filter"></i> Filtrar
+                            </button>
+                        </div>
+                        <div class="published-articles-list">
+                            @for(articulo <- articulosPublicados) {
+                                <article class="published-article" data-author-id="@articulo.getIdUsuario()">
+                                    @if(articulo.getImagen() != null && !articulo.getImagen().isEmpty()) {
+                                        <img src="@articulo.getImagen()" alt="@articulo.getTitulo()" class="article-image">
+                                    } else {
+                                        <img src="@routes.Assets.versioned("images/article-placeholder.jpg")" alt="Imagen predeterminada" class="article-image">
+                                    }
+                                    <div class="article-content">
+                                        <h3>@articulo.getTitulo()</h3>
+                                        <div class="article-meta">
+                                            <span class="article-category">@articulo.getCategoria()</span>
+                                            <span class="article-date">@articulo.getFechaPublicacion().format("dd MMM yyyy")</span>
+                                        </div>
+                                        <p class="article-excerpt">
+                                            @if(articulo.getContenido().length() > 100) {
+                                                @articulo.getContenido().substring(0, 100)...
+                                            } else {
+                                                @articulo.getContenido()
+                                            }
+                                        </p>
+                                        <div class="article-footer">
+                                            <a href="@routes.ArticulosController.mostrarArticulo(articulo.getIdArticulo())" class="read-more">Leer más</a>
+                                            <span class="article-author">@articulo.getAutor()</span>
+                                        </div>
+                                    </div>
+                                </article>
+                            }
+                            @if(articulosPublicados.isEmpty()) {
+                                <div class="no-articles">
+                                    <i class="fas fa-newspaper"></i>
+                                    <p>No hay artículos publicados aún</p>
+                                    <a href="@routes.ArticulosController.mostrarFormularioCreacion()" class="btn-new-article">
+                                        <i class="fas fa-plus"></i> Crear primer artículo
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </section>
+                </aside>
             </div>
         </div>
-    </div>
-	
-	<div id="overlay"></div>
-	        <!-- Noticias Destacadas -->
-			<!--<section class="main-news-container">-->
-			<section class="main-news">
-			    <img href="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Título de la noticia">
-			    <div class="main-news-text">
-			        <h1>Título de la Noticia Principal</h1>
-			        <p>Breve descripción de la noticia principal.</p>
-			        <a href="enlace-a-la-noticia" target="_blank">Leer más</a>
-			    </div>
-			</section>
-			<!--</section>-->
+    </main>
 
-
-
-	        <!-- Noticias Secundarias -->
-			
-	        <section class="secondary-news">
-				<div class="title-section">
-									            <h2>Noticias Secundarias</h2>
-				</div>
-	            <div class="secondary-news-container">
-	                <div id="noticia-secundaria-1" class="secondary-news-item"></div>
-	                <div id="noticia-secundaria-2" class="secondary-news-item"></div>
-	            </div>
-	        </section>
-
-	        <!-- Más Noticias -->
-	        <section>
-				<div class="title-section">
-												            <h2>Más Noticias</h2>
-							</div>
-	            
-	            <div id="noticias-lista" class="news-grid"></div>
-	        </section>
-
-	        <!-- Artículos Propios -->
-			<section>
-			    <h2>Artículos Propios</h2>
-			    <ul id="articulos-lista"></ul>
-			</section>
-
-			<!-- Formulario para agregar artículos -->
-			<section>
-			    <h2>Agregar un Artículo</h2>
-			    <form id="form-articulo">
-			        <input type="text" id="titulo" placeholder="Título" required>
-			        <input type="text" id="autor" placeholder="Autor" required>
-			        <input type="text" id="categoria" placeholder="Categoría" required>
-			        <textarea id="contenido" placeholder="Contenido" required></textarea>
-					<input type="text" id="imagen" placeholder="URL de Imagen">
-			        <button type="submit">Publicar</button>
-			    </form>
-			</section>
-</main>
-<script src="@routes.Assets.versioned("javascripts/main.js")"></script>
-
-<script>
-// Añade este script para manejar mejor el cierre de sesión
-function confirmLogout() {
-    if(confirm("¿Estás seguro que deseas cerrar sesión?")) {
-        // Opcional: Hacer una llamada AJAX para limpieza adicional
-        fetch('@routes.AuthController.logout()', {
-            method: 'GET',
-            credentials: 'same-origin' // Incluye cookies
-        }).then(() => {
-            window.location.href = '@routes.HomeController.index()';
-        });
-        return true;
+    <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
+    <script>
+    function confirmLogout() {
+        return confirm("¿Estás seguro que deseas cerrar sesión?");
     }
-    return false;
-}
 
-// Evita que el navegador cacheé la página al usar el botón "Atrás"
-window.onpageshow = function(event) {
-    if (event.persisted) {  // Si la página viene del cache
-        window.location.reload();  // Fuerza una recarga
-    }
-};
+    // Filtrado de artículos
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterBtn = document.getElementById('filter-articles');
+        if (filterBtn) {
+            const articles = document.querySelectorAll('.published-article');
+            const currentUserId = @usuario.getIdUsuario();
+            let showingAll = true;
 
-</script>
-  
+            filterBtn.addEventListener('click', function() {
+                showingAll = !showingAll;
+                
+                articles.forEach(article => {
+                    const authorId = parseInt(article.getAttribute('data-author-id'));
+                    
+                    if (showingAll) {
+                        article.style.display = 'block';
+                        filterBtn.innerHTML = '<i class="fas fa-filter"></i> Mostrar solo míos';
+                    } else {
+                        article.style.display = authorId === currentUserId ? 'block' : 'none';
+                        filterBtn.innerHTML = '<i class="fas fa-filter"></i> Mostrar todos';
+                    }
+                });
+            });
+        }
+    });
+    </script>
 }

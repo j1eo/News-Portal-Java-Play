@@ -1,0 +1,106 @@
+@(articulos: List[models.Articulo], usuario: models.Usuario, message: String)(implicit request: play.mvc.Http.Request)
+
+@main("Listado de Artículos - UR NEWS", message) {
+    <div class="container">
+        <h1>Artículos Recientes</h1>
+        
+        @if(usuario != null) {
+            <a href="@routes.ArticulosController.mostrarFormularioCreacion()" class="btn">
+                <i class="icon-plus"></i> Nuevo Artículo
+            </a>
+        }
+        
+        <div class="articles-grid">
+            @for(articulo <- articulos) {
+                <div class="article-card">
+                    @if(articulo.getImagen() != null && !articulo.getImagen().isEmpty()) {
+                        <img src="@articulo.getImagen()" alt="@articulo.getTitulo()">
+                    }
+                    <div class="article-info">
+                        <h2>@articulo.getTitulo()</h2>
+                        <p class="meta">
+                            Por @articulo.getAutor() | 
+                            @articulo.getFechaPublicacion().format("dd/MM/yyyy") | 
+                            @articulo.getCategoria()
+                        </p>
+                        <p class="excerpt">
+                            @if(articulo.getContenido().length() > 150) {
+                                @articulo.getContenido().substring(0, 150)...
+                            } else {
+                                @articulo.getContenido()
+                            }
+                        </p>
+                        <a href="@routes.ArticulosController.mostrarArticulo(articulo.getIdArticulo())" class="btn">
+                            Leer más
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .article-card {
+            border: 1px solid #e1e1e1;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .article-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .article-info {
+            padding: 15px;
+        }
+        
+        .article-info h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .meta {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        
+        .excerpt {
+            color: #34495e;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+    </style>
+}

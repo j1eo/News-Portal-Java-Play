@@ -1,0 +1,224 @@
+@(articulo: models.Articulo, relacionados: List[Articulo], usuario: models.Usuario, message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
+
+@main("Panel de Usuario", message) {
+    <main>
+        <div class="user-dashboard-container">
+            <!-- Barra superior con información de usuario -->
+            <div class="user-header">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Bienvenido, <strong>@usuario.getNombre()</strong></span>
+                </div>
+                <a href="@routes.AuthController.logout()" class="logout-btn" onclick="confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </a>
+            </div>
+
+            <!-- Contenido principal del dashboard -->
+            <div class="dashboard-content">
+                <div class="article-detail-container">
+                    <!-- Ruta de navegación -->
+                    <div class="breadcrumb">
+                        <a href="@routes.UserController.dashboard()">Dashboard</a> > 
+                       <a href="@routes.ArticulosController.listarArticulos()">Artículos</a> > 
+                        <span>@articulo.getTitulo()</span>
+                    </div>
+
+                    <!-- Contenido principal del artículo -->
+                    <article class="article-content">
+                        <div class="article-header">
+                            <h1>@articulo.getTitulo()</h1>
+                            <div class="article-meta">
+                                <span class="author">Por @articulo.getAutor()</span>
+                                <span class="date">@articulo.getFechaPublicacion()</span>
+                                <span class="category">@articulo.getCategoria()</span>
+                            </div>
+                        </div>
+
+                        @if(articulo.getImagen() != null && !articulo.getImagen().isEmpty()) {
+                            <div class="article-image">
+                                <img src="@articulo.getImagen()" alt="@articulo.getTitulo()">
+                            </div>
+                        }
+
+                        <div class="article-body">
+                            @Html(articulo.getContenido())
+                        </div>
+
+                        <div class="article-actions">
+                            <button class="action-btn">
+                                <i class="fas fa-thumbs-up"></i> Me gusta (@articulo.getMeGusta())
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-thumbs-down"></i> No me gusta (@articulo.getNoMeGusta())
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-share-alt"></i> Compartir
+                            </button>
+                            <button class="action-btn">
+                                <i class="fas fa-bookmark"></i> Guardar
+                            </button>
+                        </div>
+                    </article>
+
+                    <!-- Artículos relacionados -->
+                    @if(!relacionados.isEmpty()) {
+                        <section class="related-articles">
+                            <h2><i class="fas fa-link"></i> Artículos relacionados</h2>
+                            <div class="related-grid">
+                                @for(rel <- relacionados) {
+                                    <div class="related-item">
+                                        @if(rel.getImagen() != null && !rel.getImagen().isEmpty()) {
+                                            <img src="@rel.getImagen()" alt="@rel.getTitulo()">
+                                        }
+                                        <h3>@rel.getTitulo()</h3>
+                                        <a href="@routes.ArticulosController.mostrarArticulo(rel.getIdArticulo())" class="action-btn">
+                                            <i class="fas fa-book-reader"></i> Leer más
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </section>
+                    }
+
+                    <!-- Sección de comentarios -->
+                    <section class="comments-section">
+                        <h2><i class="fas fa-comments"></i> Comentarios</h2>
+                        <div class="comment-form">
+                            <textarea placeholder="Escribe tu comentario..."></textarea>
+                            <button class="action-btn">
+                                <i class="fas fa-paper-plane"></i> Publicar comentario
+                            </button>
+                        </div>
+                        <div class="comments-list">
+                            <p>No hay comentarios aún. Sé el primero en comentar.</p>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        /* Estilos específicos para la vista de artículo */
+        .article-detail-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .article-header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .article-meta {
+            margin-bottom: 20px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .article-meta span {
+            margin-right: 15px;
+        }
+
+        .article-image img {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+
+        .article-body {
+            line-height: 1.8;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            color: #34495e;
+        }
+
+        .article-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+            padding: 15px 0;
+            border-top: 1px solid #ecf0f1;
+            border-bottom: 1px solid #ecf0f1;
+            flex-wrap: wrap;
+        }
+
+        .related-articles {
+            margin: 40px 0;
+        }
+
+        .related-articles h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .related-item {
+            border: 1px solid #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .related-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .related-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .related-item h3 {
+            padding: 15px;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        .comments-section {
+            margin-top: 50px;
+        }
+
+        .comments-section h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            min-height: 100px;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+    </style>
+
+    <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
+}

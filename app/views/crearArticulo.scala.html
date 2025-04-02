@@ -1,0 +1,169 @@
+@(usuario: models.Usuario, message: String)(implicit request: play.mvc.Http.Request)
+
+@main("Crear Nuevo Artículo - UR NEWS", message) {
+    <div class="container">
+        <h1>Crear Nuevo Artículo</h1>
+        
+        <form id="form-crear-articulo" class="article-form" action="@routes.ArticulosController.crearArticulo()" method="POST">
+            @if(usuario != null) {
+                <input type="hidden" name="autor" value="@usuario.getNombre()">
+            }
+            
+            <div class="form-group">
+                <label for="titulo">Título *</label>
+                <input type="text" id="titulo" name="titulo" required class="form-control" placeholder="Ej: Las últimas tendencias en tecnología">
+            </div>
+            
+            <div class="form-group">
+                <label for="contenido">Contenido *</label>
+                <textarea id="contenido" name="contenido" required class="form-control" rows="10" placeholder="Escribe aquí el contenido de tu artículo..."></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="categoria">Categoría *</label>
+                    <select id="categoria" name="categoria" class="form-control" required>
+                        <option value="">Seleccione una categoría</option>
+                        <option value="TECNOLOGIA">Tecnología</option>
+                        <option value="CIENCIA">Ciencia</option>
+                        <option value="CULTURA">Cultura</option>
+                        <option value="DEPORTES">Deportes</option>
+                        <option value="POLITICA">Política</option>
+                    </select>
+                </div>
+                
+                <div class="form-group col-md-6">
+                    <label for="estado">Estado *</label>
+                    <select id="estado" name="estado" class="form-control" required>
+                        <option value="BORRADOR">Borrador</option>
+                        <option value="PUBLICADO">Publicado</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="imagen">URL de la Imagen (opcional)</label>
+                <input type="url" id="imagen" name="imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
+                <small class="text-muted">Usa una imagen con relación de aspecto 16:9 para mejores resultados</small>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Publicar Artículo
+                </button>
+                <a href="@routes.ArticulosController.listarArticulos()" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+        
+        .article-form {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+            transition: border 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+        }
+        
+        textarea.form-control {
+            min-height: 250px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+        
+        .text-muted {
+            color: #7f8c8d;
+            font-size: 0.85em;
+        }
+    </style>
+
+    <script>
+        // Validación básica del formulario
+        document.getElementById('form-crear-articulo').addEventListener('submit', function(e) {
+            const titulo = document.getElementById('titulo').value.trim();
+            const contenido = document.getElementById('contenido').value.trim();
+            
+            if (!titulo || !contenido) {
+                e.preventDefault();
+                alert('Por favor complete todos los campos requeridos');
+            }
+        });
+    </script>
+}

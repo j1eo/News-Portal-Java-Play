@@ -1,0 +1,89 @@
+@(title: String, message: String)(content: Html)
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>@title</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/noticias.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/seccion-articulos.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/dashboard.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/LOGO.png")">
+        <!-- Añadir Font Awesome para iconos -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    </head>
+    <body>
+        <!-- Header reutilizable -->
+        <header>
+            <div class="container">
+				<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+
+                <a href="@routes.HomeController.index()" class="logo-link">
+                    <div class="logo">
+                        <img src="@routes.Assets.versioned("images/LOGO.png")" alt="Logo">
+                        <h1>@message</h1>
+                    </div>
+                </a> 
+                <div class="buttons">
+                    <button onclick="window.location.href='@routes.AuthController.login()'" class="btn btn-primary" type="button">
+                        VER PERFIL
+                    </button>
+                    <button class="btn btn-secondary" type="button">
+                        SUSCRÍBETE
+                    </button>
+                </div>
+            </div>
+        </header>
+        <nav class="nav-bar">    
+            <button class="nav-button">NOTICIAS LOCALES</button>
+            <button class="nav-button">NOTICIAS NACIONALES</button>
+            <button class="nav-button">ARTÍCULOS</button>
+            <button class="nav-button">MILENIO</button>
+        </nav>
+        
+        <!-- Menú lateral -->
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <p>Descubre las últimas noticias</p>
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-bar" placeholder="Buscar..." oninput="filtrarResultados()">
+            </div>
+            <a href="#">Noticias Locales</a>
+            <a href="#">Noticias Nacionales</a>
+            <a href="#">Artículos</a>
+            <a href="#">Preguntas Frecuentes</a>
+        </div>
+        
+        <!-- Overlay para el menú -->
+        <div id="navOverlay" class="nav-overlay"></div>
+
+        <!-- Contenido dinámico de la página -->
+        @content
+
+        <!-- Scripts al final del body -->
+        <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
+        
+        <!-- Script inline como respaldo -->
+        <script>
+        // Definir funciones globales si no están en main.js
+        if (typeof openNav !== 'function') {
+            window.openNav = function() {
+                document.getElementById("mySidenav").style.width = "450px";
+                document.getElementById("navOverlay").style.display = "block";
+                document.body.style.overflow = "hidden";
+            };
+        }
+        
+        if (typeof closeNav !== 'function') {
+            window.closeNav = function() {
+                document.getElementById("mySidenav").style.width = "0";
+                document.getElementById("navOverlay").style.display = "none";
+                document.body.style.overflow = "auto";
+            };
+        }
+        
+        // Event listener para el overlay
+        document.getElementById('navOverlay')?.addEventListener('click', closeNav);
+        </script>
+    </body>
+</html>

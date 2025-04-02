@@ -1,0 +1,157 @@
+@(usuarios: List[models.Usuario], message: String)(implicit request: play.mvc.Http.Request)
+
+@main("Datos de Usuarios", message) {
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h2>@message</h2>
+                <a href="@routes.AdminController.dashboard()" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellidos</th>
+                            <th>Email</th>
+                            <th>Suscripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for(usuario <- usuarios) {
+                        <tr>
+                            <td>@usuario.getIdUsuario()</td>
+                            <td>@usuario.getNombre()</td>
+                            <td>@usuario.getApellidos()</td>
+                            <td>@usuario.getEmail()</td>
+                            <td>
+                                <span class="badge @if(usuario.getSuscripcion().equals("PREMIUM")) {
+                                    badge-primary
+                                } else {
+                                    badge-secondary
+                                }">
+                                    @usuario.getSuscripcion()
+                                </span>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-primary edit-user" 
+                                        data-id="@usuario.getIdUsuario()"
+                                        data-toggle="modal" 
+                                        data-target="#editUserModal">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="btn btn-sm btn-danger delete-user" 
+                                        data-id="@usuario.getIdUsuario()">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal de Edición -->
+        <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Usuario</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form id="editUserForm" method="PUT">
+                        <div class="modal-body">
+                            <input type="hidden" id="editUserId" name="id">
+                            <div class="form-group">
+                                <label for="editNombre">Nombre</label>
+                                <input type="text" class="form-control" id="editNombre" name="nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editApellidos">Apellidos</label>
+                                <input type="text" class="form-control" id="editApellidos" name="apellidos" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEmail">Email</label>
+                                <input type="email" class="form-control" id="editEmail" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editSuscripcion">Suscripción</label>
+                                <select class="form-control" id="editSuscripcion" name="suscripcion" required>
+                                    <option value="BASICA">Básica</option>
+                                    <option value="PREMIUM">Premium</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        // Configurar modal de edición
+        $('.edit-user').click(function() {
+            var userId = $(this).data('id');
+            $.get('/admin/usuario/' + userId, function(data) {
+                $('#editUserId').val(data.idUsuario);
+                $('#editNombre').val(data.nombre);
+                $('#editApellidos').val(data.apellidos);
+                $('#editEmail').val(data.email);
+                $('#editSuscripcion').val(data.suscripcion);
+            });
+        });
+
+        // Enviar formulario de edición
+        $('#editUserForm').submit(function(e) {
+            e.preventDefault();
+            var userId = $('#editUserId').val();
+            var formData = $(this).serialize();
+            
+            $.ajax({
+                url: '/admin/usuario/' + userId,
+                type: 'PUT',
+                data: formData,
+                success: function() {
+                    $('#editUserModal').modal('hide');
+                    location.reload();
+                },
+                error: function() {
+                    alert('Error al actualizar el usuario');
+                }
+            });
+        });
+
+        // Eliminar usuario
+        $('.delete-user').click(function() {
+            if (confirm('¿Estás seguro de eliminar este usuario?')) {
+                var userId = $(this).data('id');
+                $.ajax({
+                    url: '/admin/usuario/' + userId,
+                    type: 'DELETE',
+                    success: function() {
+                        location.reload();
+                    },
+                    error: function() {
+                        alert('Error al eliminar el usuario');
+                    }
+                });
+            }
+        });
+    });
+    </script>
+}
