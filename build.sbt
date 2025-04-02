@@ -16,6 +16,7 @@ libraryDependencies ++= Seq(
   cache,
   javaWs,
   javaJpa,
+  filters,
   evolutions,
   "org.mindrot" % "jbcrypt" % "0.4",
   "com.auth0" % "java-jwt" % "3.18.2",

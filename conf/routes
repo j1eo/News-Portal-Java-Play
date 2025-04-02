@@ -1,27 +1,38 @@
-# Routes existentes confirmadas:
+# Home
 GET     /                       controllers.HomeController.index()
-GET     /register               controllers.AuthController.register()
+
+# Authentication
 GET     /login                  controllers.AuthController.login()
 POST    /login                  controllers.AuthController.autenticar()
-GET     /auth/crearUsuarioPrueba controllers.AuthController.crearUsuarioPrueba()
+GET     /register               controllers.AuthController.register()
 POST    /auth/registrar         controllers.AuthController.registrarUsuario()
-GET     /noticias               controllers.NoticiasController.obtenerNoticias()
-GET     /articulos              controllers.ArticulosController.obtenerArticulos()
-POST    /articulos              controllers.ArticulosController.agregarArticulo()
+GET     /auth/crearUsuarioPrueba controllers.AuthController.crearUsuarioPrueba()
 GET     /logout                 controllers.AuthController.logout()
-GET     /assets/*file           controllers.Assets.versioned(path="/public", file: Asset)
 
-# Rutas para UserController (asegúrate que existan los métodos)
+# User routes
+GET     /user                   controllers.UserController.dashboard()
 GET     /user/dashboard         controllers.UserController.dashboard()
+GET     /user/perfil            controllers.UserController.miPerfil()
 
-
-# Rutas para AdminController (asegúrate que existan los métodos)
+# Admin routes
+GET     /admin                  controllers.AdminController.dashboard()
 GET     /admin/dashboard        controllers.AdminController.dashboard()
+GET     /admin/usuarios         controllers.AdminController.gestionarUsuarios()
 
-GET     /admin/dashboard    controllers.AdminController.dashboard()
-GET     /user/dashboard     controllers.UserController.dashboard()
-GET     /user/perfil        controllers.UserController.miPerfil()
+# Nueva ruta para obtener usuario
+GET     /admin/usuario/:id      controllers.AdminController.obtenerUsuario(id: Long)
 
-# Redirecciones temporales
-GET     /admin      controllers.AdminController.dashboard()
-GET     /user       controllers.UserController.dashboard()
+PUT     /admin/usuario/:id      controllers.AdminController.actualizarUsuario(id: Long)
+DELETE  /admin/usuario/:id      controllers.AdminController.eliminarUsuario(id: Long)
+PUT     /admin/articulo/:id/estado controllers.AdminController.cambiarEstadoArticulo(id: Long, estado: String)
+
+# News & Articles
+GET     /noticias               controllers.NoticiasController.obtenerNoticias()
+GET     /articulos              controllers.ArticulosController.listarArticulos()
+POST    /articulos              controllers.ArticulosController.crearArticulo()
+GET     /articulo/:id           controllers.ArticulosController.mostrarArticulo(id: Integer)
+GET     /articulos/nuevo        controllers.ArticulosController.mostrarFormularioCreacion()
+DELETE  /articulo/:id           controllers.ArticulosController.eliminarArticulo(id: Integer)
+
+# Assets
+GET     /assets/*file           controllers.Assets.versioned(path="/public", file: Asset)
