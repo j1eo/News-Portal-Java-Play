@@ -283,4 +283,62 @@ public class AuthService {
             return rs.next() ? rs.getInt(1) : 0;
         }
     }
+    
+    /**
+     * Actualiza los datos básicos de una cuenta (nombre, apellidos, email, foto).
+     * No actualiza campos sensibles como nickname o contraseña.
+     */
+    public boolean actualizarCuenta(Cuenta cuenta) throws SQLException {
+        String sql = "UPDATE Cuenta SET Nombre = ?, Apellidos = ?, Email = ?, Foto_Perfil = ? WHERE ID_Cuenta = ?";
+        
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, cuenta.getNombre());
+            stmt.setString(2, cuenta.getApellidos());
+            stmt.setString(3, cuenta.getEmail());
+            stmt.setString(4, cuenta.getFotoPerfil());
+            stmt.setInt(5, cuenta.getIdCuenta());
+            
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Actualiza la contraseña de una cuenta (requiere contraseña actual para validación).
+     */
+    public boolean actualizarContraseña(int idCuenta, String nuevaContraseña, String contraseñaActual) throws SQLException {
+        String sql = "SELECT Clave_Acceso FROM Cuenta WHERE ID_Cuenta = ?";
+        
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, idCuenta);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next() && BCrypt.checkpw(contraseñaActual, rs.getString("Clave_Acceso"))) {
+                String updateSql = "UPDATE Cuenta SET Clave_Acceso = ? WHERE ID_Cuenta = ?";
+                PreparedStatement updateStmt = conn.prepareStatement(updateSql);
+                updateStmt.setString(1, BCrypt.hashpw(nuevaContraseña, BCrypt.gensalt()));
+                updateStmt.setInt(2, idCuenta);
+                return updateStmt.executeUpdate() > 0;
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Verifica si el email ya está registrado por otro usuario.
+     */
+    public boolean existeEmail(String email, int excludeIdCuenta) throws SQLException {
+        String sql = "SELECT 1 FROM Cuenta WHERE Email = ? AND ID_Cuenta != ?";
+        
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, email);
+            stmt.setInt(2, excludeIdCuenta);
+            return stmt.executeQuery().next();
+        }
+    }
 }
