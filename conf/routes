@@ -13,6 +13,9 @@ GET     /logout                 controllers.AuthController.logout()
 GET     /user                   controllers.UserController.dashboard()
 GET     /user/dashboard         controllers.UserController.dashboard()
 GET     /user/perfil            controllers.UserController.miPerfil()
+# Edición de perfil de usuario
+GET     /user/perfil/editar      controllers.UserController.mostrarFormularioEdicion()
+POST    /user/perfil/actualizar  controllers.UserController.actualizarPerfil()
 
 # Admin routes
 GET     /admin                  controllers.AdminController.dashboard()
