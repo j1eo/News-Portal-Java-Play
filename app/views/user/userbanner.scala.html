@@ -13,27 +13,34 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     </head>
     <body>
-        <!-- Header reutilizable -->
+        <!-- Header actualizado -->
         <header>
             <div class="container">
-				<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+                <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
 
-                <a href="@routes.HomeController.index()" class="logo-link">
+                <!-- Logo con redirección condicional -->
+                <a href="@if(request().cookie("jwt") != null) {@routes.UserController.dashboard()} else {@routes.HomeController.index()}" class="logo-link">
                     <div class="logo">
                         <img src="@routes.Assets.versioned("images/LOGO.png")" alt="Logo">
                         <h1>@message</h1>
                     </div>
                 </a> 
+                
+                <!-- Botones condicionales -->
                 <div class="buttons">
-                    <button onclick="window.location.href='@routes.AuthController.login()'" class="btn btn-primary" type="button">
-                        VER PERFIL
-                    </button>
+                    @if(request().cookie("jwt") == null) {
+                        <!-- Solo muestra "VER PERFIL" si no hay sesión -->
+                        <button onclick="window.location.href='@routes.AuthController.login()'" class="btn btn-primary" type="button">
+                            VER PERFIL
+                        </button>
+                    }
                     <button class="btn btn-secondary" type="button">
                         SUSCRÍBETE
                     </button>
                 </div>
             </div>
         </header>
+
         <nav class="nav-bar">    
             <button class="nav-button">NOTICIAS LOCALES</button>
             <button class="nav-button">NOTICIAS NACIONALES</button>
@@ -60,7 +67,7 @@
         <!-- Contenido dinámico de la página -->
         @content
 
-        <!-- Scripts al final del body -->
+        <!-- Scripts -->
         <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
         
         <!-- Script inline como respaldo -->

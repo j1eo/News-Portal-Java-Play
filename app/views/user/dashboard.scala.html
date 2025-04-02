@@ -21,7 +21,8 @@
                 <div class="profile-section">
                     <div class="user-card">
                         <div class="user-avatar">
-                            <img src="@routes.Assets.versioned("images/favicon.png")" alt="Avatar">
+							<img src="@usuario.getFotoPerfil()" alt="Avatar" 
+							        onerror="this.src='@routes.Assets.versioned("images/default-avatar.png")'">
                         </div>
                         <div class="user-info">
                             <h3>@usuario.getNombre() @usuario.getApellidos()</h3>
@@ -31,9 +32,9 @@
                     </div>
 
                     <div class="dashboard-actions">
-                        <a href="@routes.UserController.dashboard()" class="action-btn">
-                            <i class="fas fa-user-edit"></i> Editar perfil
-                        </a>
+						<a href="@routes.UserController.mostrarFormularioEdicion()" class="action-btn">
+						    <i class="fas fa-user-edit"></i> Editar perfil
+						</a>
                         <a href="@routes.NoticiasController.obtenerNoticias()" class="action-btn">
                             <i class="fas fa-newspaper"></i> Ver noticias
                         </a>
