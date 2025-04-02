@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class Articulo {
     private int idArticulo;
-    private int idMiembro;
+    private int idUsuario;
     private String titulo;
     private String autor;
     private String contenido;
@@ -14,12 +14,14 @@ public class Articulo {
     private String categoria;
     private int meGusta;
     private int noMeGusta;
+    
+    public Articulo() {}
 
     // **Constructor completo**
-    public Articulo(int idArticulo, int idMiembro, String titulo, String autor, String contenido, String imagen, 
+    public Articulo(int idArticulo, int idUsuario, String titulo, String autor, String contenido, String imagen, 
                     Date fechaPublicacion, String estado, String categoria, int meGusta, int noMeGusta) {
         this.idArticulo = idArticulo;
-        this.idMiembro = idMiembro;
+        this.idUsuario = idUsuario;
         this.titulo = titulo;
         this.autor = autor;
         this.contenido = contenido;
@@ -40,12 +42,12 @@ public class Articulo {
         this.idArticulo = idArticulo;
     }
 
-    public int getIdMiembro() {
-        return idMiembro;
+    public int getIdUsuario() {
+        return idUsuario;
     }
 
-    public void setIdMiembro(int idMiembro) {
-        this.idMiembro = idMiembro;
+    public void setIdUsuario(int idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getTitulo() {
