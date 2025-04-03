@@ -81,44 +81,6 @@ function cargarNoticias() {
 // Simulación de registros por usuario
 let registroLikes = {};
 
-function cargarArticulos() {
-    fetch("/articulos")
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Error en la respuesta del servidor");
-            }
-            return response.json();
-        })
-        .then(data => {
-            const lista = document.getElementById("articulos-lista");
-            lista.innerHTML = "";
-
-            data.forEach(articulo => {
-                const item = document.createElement("li");
-                item.innerHTML = `
-                    <h3>${articulo.titulo}</h3>
-                    <p><strong>Autor:</strong> ${articulo.autor}</p>
-                    <p><strong>Categoría:</strong> ${articulo.categoria}</p>
-                    <p><strong>Estado:</strong> ${articulo.estado}</p>
-                    <p><strong>Contenido:</strong> ${articulo.contenido}</p>
-                    <p><strong>Fecha de publicación:</strong> ${new Date(articulo.fechaPublicacion).toLocaleDateString()}</p>
-                    <p><strong>Me gusta:</strong> <span id="me-gusta-${articulo.idArticulo}">${articulo.meGusta}</span> |
-                       <strong>No me gusta:</strong> <span id="no-me-gusta-${articulo.idArticulo}">${articulo.noMeGusta}</span></p>
-                    ${articulo.imagen ? `<img src="${articulo.imagen}" alt="Imagen del artículo" style="max-width:300px;">` : ""}
-                    <br>
-                    <button class="me-gusta-btn" onclick="toggleMeGusta(${articulo.idArticulo})">👍 Me gusta</button>
-                    <button class="no-me-gusta-btn" onclick="toggleNoMeGusta(${articulo.idArticulo})">👎 No me gusta</button>
-                `;
-                lista.appendChild(item);
-
-                // Inicializar registro de interacción por artículo
-                if (!registroLikes[articulo.idArticulo]) {
-                    registroLikes[articulo.idArticulo] = { meGusta: false, noMeGusta: false };
-                }
-            });
-        })
-        .catch(error => console.error("Error al cargar artículos:", error));
-}
 
 // Función para toggle "Me gusta"
 function toggleMeGusta(idArticulo) {

@@ -1,64 +1,97 @@
-@(message: String)
+@(message: String, articulosPublicados: List[models.Articulo])
 
-@main("UR NEWS -- Pagina Principal",message) {
+@main("UR NEWS -- Pagina Principal", message) {
+	<main class="dashboard-main">
+	       <div class="user-dashboard-container">
+	          
 
-    <main>
-		<div id="overlay"></div>
-        <!-- Noticias Destacadas -->
-		<!--<section class="main-news-container">-->
-		<section class="main-news">
-		    <img src="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Título de la noticia">
-		    <div class="main-news-text">
-		        <h1>Título de la Noticia Principal</h1>
-		        <p>Breve descripción de la noticia principal.</p>
-		        <a href="enlace-a-la-noticia" target="_blank">Leer más</a>
-		    </div>
-		</section>
-		<!--</section>-->
+	           <!-- Contenido principal -->
+	           <div class="dashboard-main-content">
+	               <!-- Sección de perfil -->
+	               
 
+	               <!-- Sección central de contenido -->
+	               <div class="content-section">
+	                   <!-- Noticias Destacadas -->
+	                   <section class="main-news">
+	                       <img src="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Título de la noticia">
+	                       <div class="main-news-text">
+	                           <h1>Título de la Noticia Principal</h1>
+	                           <p>Breve descripción de la noticia principal.</p>
+	                           <a href="enlace-a-la-noticia" target="_blank">Leer más</a>
+	                       </div>
+	                   </section>
 
+	                   <!-- Noticias Secundarias -->
+	                   <section class="secondary-news">
+	                       <div class="title-section">
+	                           <h2>Noticias Secundarias</h2>
+	                       </div>
+	                       <div class="secondary-news-container">
+	                           <div id="noticia-secundaria-1" class="secondary-news-item"></div>
+	                           <div id="noticia-secundaria-2" class="secondary-news-item"></div>
+	                       </div>
+	                   </section>
 
-        <!-- Noticias Secundarias -->
-		
-        <section class="secondary-news">
-			<div class="title-section">
-								            <h2>Noticias Secundarias</h2>
-			</div>
-            <div class="secondary-news-container">
-                <div id="noticia-secundaria-1" class="secondary-news-item"></div>
-                <div id="noticia-secundaria-2" class="secondary-news-item"></div>
-            </div>
-        </section>
+	                   <!-- Más Noticias -->
+	                   <section class="more-news">
+	                       <div class="title-section">
+	                           <h2>Noticias de MILENIO</h2>
+	                       </div>
+	                       <div id="noticias-lista" class="news-grid"></div>
+	                   </section>
+	               </div>
 
-        <!-- Más Noticias -->
-        <section>
-			<div class="title-section">
-											            <h2>Más Noticias</h2>
-						</div>
-            
-            <div id="noticias-lista" class="news-grid"></div>
-        </section>
-
-        <!-- Artículos Propios -->
-		<section>
-		    <h2>Artículos Propios</h2>
-		    <ul id="articulos-lista"></ul>
-		</section>
-
-		<!-- Formulario para agregar artículos -->
-		<section>
-		    <h2>Agregar un Artículo</h2>
-		    <form id="form-articulo">
-		        <input type="text" id="titulo" placeholder="Título" required>
-		        <input type="text" id="autor" placeholder="Autor" required>
-		        <input type="text" id="categoria" placeholder="Categoría" required>
-		        <textarea id="contenido" placeholder="Contenido" required></textarea>
-				<input type="text" id="imagen" placeholder="URL de Imagen">
-		        <button type="submit">Publicar</button>
-		    </form>
-		</section>
-
-	</main>
+	               <!-- Sidebar de artículos -->
+	               <aside class="articles-sidebar">
+	                   <section class="sidebar-section">
+	                       <div class="sidebar-header">
+	                           <h2>Artículos Publicados</h2>
+	                           
+	                       </div>
+	                       <div class="published-articles-list">
+	                           @for(articulo <- articulosPublicados) {
+	                               <article class="published-article" data-author-id="@articulo.getIdUsuario()">
+	                                   @if(articulo.getImagen() != null && !articulo.getImagen().isEmpty()) {
+	                                       <img src="@articulo.getImagen()" alt="@articulo.getTitulo()" class="article-image">
+	                                   } else {
+	                                       <img src="@routes.Assets.versioned("images/article-placeholder.jpg")" alt="Imagen predeterminada" class="article-image">
+	                                   }
+	                                   <div class="article-content">
+	                                       <h3>@articulo.getTitulo()</h3>
+	                                       <div class="article-meta">
+	                                           <span class="article-category">@articulo.getCategoria()</span>
+	                                           <span class="article-date">@articulo.getFechaPublicacion().format("dd MMM yyyy")</span>
+	                                       </div>
+	                                       <p class="article-excerpt">
+	                                           @if(articulo.getContenido().length() > 100) {
+	                                               @articulo.getContenido().substring(0, 100)...
+	                                           } else {
+	                                               @articulo.getContenido()
+	                                           }
+	                                       </p>
+	                                       <div class="article-footer">
+	                                           <a href="@routes.ArticulosController.mostrarArticulo(articulo.getIdArticulo())" class="read-more">Leer más</a>
+	                                           <span class="article-author">@articulo.getAutor()</span>
+	                                       </div>
+	                                   </div>
+	                               </article>
+	                           }
+	                           @if(articulosPublicados.isEmpty()) {
+	                               <div class="no-articles">
+	                                   <i class="fas fa-newspaper"></i>
+	                                   <p>No hay artículos publicados aún</p>
+	                                   <a href="@routes.ArticulosController.mostrarFormularioCreacion()" class="btn-new-article">
+	                                       <i class="fas fa-plus"></i> Crear primer artículo
+	                                   </a>
+	                               </div>
+	                           }
+	                       </div>
+	                   </section>
+	               </aside>
+	           </div>
+	       </div>
+	   </main>
 
     <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
 }
