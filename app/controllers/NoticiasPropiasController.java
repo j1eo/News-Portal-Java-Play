@@ -14,6 +14,7 @@ import controllers.Secured;
 import javax.inject.Inject;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class NoticiasPropiasController extends Controller {
 
@@ -108,47 +109,54 @@ public class NoticiasPropiasController extends Controller {
             request()
         ));
     }
-
     @Security.Authenticated(Secured.class)
     public Result crearNoticia() {
         try {
             Usuario usuario = obtenerUsuarioCompleto();
             if (usuario == null) {
-                return unauthorized("Token inválido");
+                flash("error", "Debes iniciar sesión");
+                return redirect(routes.AuthController.login());
             }
 
-            // Verificar rol de usuario
+            // Obtener rol del usuario
             String userRole = jwtService.obtenerUserRole(request().cookie("jwt").value());
-            if (!"user".equals(userRole) && !"admin".equals(userRole)) {
-                return forbidden("No tienes permisos para esta acción");
-            }
-
-            JsonNode json = request().body().asJson();
-            if (json == null) {
-                return badRequest("Se esperaba JSON");
-            }
+            
+            // Procesar el formulario
+            Http.RequestBody body = request().body();
+            Map<String, String[]> formData = body.asFormUrlEncoded();
 
             NoticiaPropia noticia = new NoticiaPropia();
             noticia.setIdUsuario(usuario.getIdUsuario());
-            noticia.setTitulo(json.get("titulo").asText());
-            noticia.setAutor(json.has("autor") ? json.get("autor").asText() : usuario.getNombre());
-            noticia.setContenido(json.get("contenido").asText());
-            noticia.setImagen(json.has("imagen") ? json.get("imagen").asText() : null);
-            noticia.setEstado(json.get("estado").asText());
-            noticia.setCategoria(json.get("categoria").asText());
-            noticia.setUrl(json.has("url") ? json.get("url").asText() : null);
-            noticia.setFuente(json.has("fuente") ? json.get("fuente").asText() : null);
-            noticia.setDescripcion(json.has("descripcion") ? json.get("descripcion").asText() : null);
+            noticia.setTitulo(formData.get("titulo")[0]);
+            noticia.setAutor(formData.containsKey("autor") ? formData.get("autor")[0] : usuario.getNombre());
+            noticia.setContenido(formData.get("contenido")[0]);
+            noticia.setImagen(formData.containsKey("imagen") ? formData.get("imagen")[0] : null);
+            noticia.setEstado(formData.get("estado")[0]);
+            noticia.setCategoria(formData.get("categoria")[0]);
+            noticia.setUrl(formData.containsKey("url") ? formData.get("url")[0] : null);
+            noticia.setFuente(formData.containsKey("fuente") ? formData.get("fuente")[0] : null);
+            noticia.setDescripcion(formData.containsKey("descripcion") ? formData.get("descripcion")[0] : null);
             noticia.setMeGusta(0);
             noticia.setNoMeGusta(0);
 
             boolean creado = noticiasService.agregarNoticia(noticia);
 
-            return creado ? created("Noticia creada") : internalServerError("Error al crear noticia");
+            if (creado) {
+                flash("success", "Noticia creada exitosamente");
+                // Redirección diferente para admin
+                if ("admin".equals(userRole)) {
+                    return redirect(routes.AdminController.gestionarNoticias());
+                }
+                return redirect(routes.NoticiasPropiasController.listarNoticias());
+            } else {
+                flash("error", "Error al crear la noticia");
+                return redirect(routes.NoticiasPropiasController.mostrarFormularioCreacion());
+            }
             
         } catch (Exception e) {
             Logger.error("Error al crear noticia", e);
-            return badRequest("Datos inválidos: " + e.getMessage());
+            flash("error", "Error: " + e.getMessage());
+            return badRequest();
         }
     }
 
@@ -182,6 +190,19 @@ public class NoticiasPropiasController extends Controller {
             return internalServerError(Json.newObject()
                 .put("success", false)
                 .put("message", "Error al eliminar noticia"));
+        }
+    }
+    public Result verificarRol() {
+        try {
+            Http.Cookie jwtCookie = request().cookie("jwt");
+            if (jwtCookie == null) {
+                return unauthorized();
+            }
+            
+            String role = jwtService.obtenerUserRole(jwtCookie.value());
+            return ok(Json.newObject().put("role", role));
+        } catch (Exception e) {
+            return internalServerError();
         }
     }
 }

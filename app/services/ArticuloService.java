@@ -182,4 +182,22 @@ public class ArticuloService {
             return statement.executeUpdate() > 0;
         }
     }
+    public boolean actualizarArticulo(Articulo articulo) throws SQLException {
+        String query = "UPDATE Articulo SET Titulo = ?, Autor = ?, Contenido = ?, " +
+                      "Estado = ?, Categoria_ID = (SELECT ID_Categoria FROM Categoria WHERE Nombre = ?) " +
+                      "WHERE ID_Articulo = ?";
+
+        try (Connection connection = dbConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, articulo.getTitulo());
+            statement.setString(2, articulo.getAutor());
+            statement.setString(3, articulo.getContenido());
+            statement.setString(4, articulo.getEstado());
+            statement.setString(5, articulo.getCategoria());
+            statement.setInt(6, articulo.getIdArticulo());
+
+            return statement.executeUpdate() > 0;
+        }
+    }
 }

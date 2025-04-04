@@ -1,21 +1,19 @@
 @(currentAdmin: models.Admin, stats: Map[String, Integer], message: String)(implicit request: play.mvc.Http.Request)
 
-@main("Panel de Administración", message) {
+@adminbanner("Panel de Administración", message) {
     <div class="admin-wrapper">
         <!-- Sidebar -->
         <nav class="admin-sidebar">
             <div class="sidebar-brand">
                 <div class="brand-logo">
-                    <i class="fas fa-newspaper"></i>
+					<a href=@routes.AdminController.dashboard() class="fas fa-newspaper">
+                    </a>
                 </div>
                 <h1>UR NEWS</h1>
                 <p>Panel de Administración</p>
             </div>
             
             <div class="sidebar-user">
-                <div class="user-avatar">
-					<img src="@currentAdmin.getFotoPerfil()" alt="Avatar" 
-                </div>
                 <div class="user-info">
                     <span class="user-name">@currentAdmin.getNombre() @currentAdmin.getApellidos()</span>
                     <span class="user-role">Administrador</span>
@@ -36,13 +34,13 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="@routes.AdminController.gestionarArticulos()">
                         <i class="fas fa-file-alt"></i>
                         <span>Artículos</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="@routes.AdminController.gestionarNoticias()">
                         <i class="fas fa-bell"></i>
                         <span>Noticias</span>
                     </a>
@@ -60,12 +58,7 @@
         <main class="admin-content">
             <header class="content-header">
                 <h2>Resumen General</h2>
-                <div class="header-actions">
-                    <div class="notification-bell">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                    </div>
-                </div>
+               
             </header>
 
             <!-- Stats Cards -->
@@ -85,7 +78,7 @@
                     <div class="stat-info">
                         <h3>Artículos</h3>
                         <h1>@stats.getOrDefault("articulos", 0)</h1>
-                        <a href="#" class="stat-link">Ver todos <i class="fas fa-arrow-right"></i></a>
+                        <a href="@routes.AdminController.gestionarArticulos()" class="stat-link">Ver todos <i class="fas fa-arrow-right"></i></a>
                     </div>
                     <div class="stat-icon">
                         <i class="fas fa-file-alt"></i>
@@ -96,27 +89,18 @@
                     <div class="stat-info">
                         <h3>Noticias</h3>
                         <h1>@stats.getOrDefault("noticias", 0)</h1>
-                        <a href="#" class="stat-link">Ver todos <i class="fas fa-arrow-right"></i></a>
+                        <a href="@routes.AdminController.gestionarNoticias()" class="stat-link">Ver todos <i class="fas fa-arrow-right"></i></a>
                     </div>
                     <div class="stat-icon">
                         <i class="fas fa-newspaper"></i>
                     </div>
                 </div>
                 
-                <div class="stat-card activity">
-                    <div class="stat-info">
-                        <h3>Actividad</h3>
-                        <h1>24</h1>
-                        <span class="stat-subtext">Eventos hoy</span>
-                    </div>
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                </div>
+               
             </div>
 
             <!-- Recent Activity Section -->
-            <section class="recent-activity">
+            <section style="visibility: hidden;">
                 <h3>Actividad Reciente</h3>
                 <div class="activity-list">
                     <div class="activity-item">

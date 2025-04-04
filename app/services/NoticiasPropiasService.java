@@ -168,4 +168,27 @@ public class NoticiasPropiasService {
         noticia.setNoMeGusta(resultSet.getInt("No_Me_Gusta"));
         return noticia;
     }
+    public boolean actualizarNoticia(NoticiaPropia noticia) throws SQLException {
+        String query = "UPDATE Noticia SET Titulo = ?, Autor = ?, URL = ?, Fuente = ?, " +
+                      "Descripcion = ?, Imagen = ?, Contenido = ?, Estado = ?, " +
+                      "Categoria_ID = (SELECT ID_Categoria FROM Categoria WHERE Nombre = ?) " +
+                      "WHERE ID_Noticia = ?";
+
+        try (Connection connection = dbConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, noticia.getTitulo());
+            statement.setString(2, noticia.getAutor());
+            statement.setString(3, noticia.getUrl());
+            statement.setString(4, noticia.getFuente());
+            statement.setString(5, noticia.getDescripcion());
+            statement.setString(6, noticia.getImagen());
+            statement.setString(7, noticia.getContenido());
+            statement.setString(8, noticia.getEstado());
+            statement.setString(9, noticia.getCategoria());
+            statement.setInt(10, noticia.getIdNoticia());
+
+            return statement.executeUpdate() > 0;
+        }
+    }
 }

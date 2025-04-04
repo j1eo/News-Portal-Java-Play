@@ -33,9 +33,14 @@ public class AdminService {
 
     public int contarNoticias() throws SQLException {
         try (Connection conn = dbConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Noticia")) {
-            return rs.next() ? rs.getInt(1) : 0;
+             PreparedStatement pstmt = conn.prepareStatement(
+                 "SELECT COUNT(*) FROM Noticia WHERE estado = ?")) {
+            
+            pstmt.setString(1, "PUBLICADO"); // Establece el parámetro para el estado
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
         }
     }
 

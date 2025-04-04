@@ -1,0 +1,499 @@
+	@(noticias: List[models.NoticiaPropia], message: String)(implicit request: play.mvc.Http.Request)
+	
+	@adminbanner("Gestión de Noticias", message) {
+	<div class="news-management-container">
+	    <div class="news-header">
+	        <h1 class="title-section">GESTIÓN DE NOTICIAS</h1>
+	        <div class="header-actions">
+	            <a href="@routes.AdminController.dashboard()" class="btn btn-primary">
+	                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+	            </a>
+			
+	        </div>
+	    </div>
+	
+	    <div class="news-grid">
+	        @for(noticia <- noticias) {
+	        <div class="news-card">
+	            <div class="news-card-header">
+	                <span class="news-card-id">ID: @noticia.getIdNoticia()</span>
+	                <h3 class="news-card-title">@noticia.getTitulo()</h3>
+	                <div class="news-card-meta">
+	                    <span>@noticia.getCategoria()</span>
+	                    <span>@noticia.getFechaPublicacion()</span>
+	                </div>
+	            </div>
+	            <div class="news-card-body">
+	                <div class="news-detail">
+	                    <span class="news-detail-label">Autor:</span>
+	                    <span class="news-detail-value">@noticia.getAutor()</span>
+	                </div>
+	                <div class="news-detail">
+	                    <span class="news-detail-label">Fuente:</span>
+	                    <span class="news-detail-value">@noticia.getFuente()</span>
+	                </div>
+	                <div class="news-detail">
+	                    <span class="news-detail-label">Estado:</span>
+	                    <span class="news-detail-value @noticia.getEstado().toLowerCase()">
+	                        @noticia.getEstado()
+	                    </span>
+	                </div>
+	                <div class="news-descripcion">
+	                    <p>@noticia.getDescripcion()</p>
+	                </div>
+	                @if(noticia.getImagen() != null && !noticia.getImagen().isEmpty()) {
+	                <div class="news-image-preview">
+	                    <img src="@noticia.getImagen()" alt="Imagen de la noticia" class="img-thumbnail">
+	                </div>
+	                }
+	                <div class="news-stats">
+	                    <span><i class="fas fa-thumbs-up"></i> @noticia.getMeGusta()</span>
+	                    <span><i class="fas fa-thumbs-down"></i> @noticia.getNoMeGusta()</span>
+	                </div>
+	            </div>
+	            <div class="news-card-footer">
+	                <a href="@noticia.getUrl()" target="_blank" class="btn btn-info">
+	                    <i class="fas fa-external-link-alt"></i> Ver Original
+	                </a>
+	                <div class="footer-actions">
+	                    <button class="btn btn-primary edit-news" data-id="@noticia.getIdNoticia()">
+	                        <i class="fas fa-edit"></i> Editar
+	                    </button>
+	                    <button class="btn btn-danger delete-news" data-id="@noticia.getIdNoticia()">
+	                        <i class="fas fa-trash"></i> Eliminar
+	                    </button>
+	                </div>
+	            </div>
+	        </div>
+	        }
+	    </div>
+	</div>
+	
+	<!-- Modal para Crear/Editar Noticia -->
+	<div class="modal-overlay" id="newsModal">
+	    <div class="modal-container">
+	        <div class="modal-header">
+	            <h3><i class="fas fa-newspaper"></i> <span id="modalTitle">Añadir Nueva Noticia</span></h3>
+	            <button class="modal-close"><i class="fas fa-times"></i></button>
+	        </div>
+	        <form id="newsForm" method="POST">
+	            <div class="modal-body">
+	                <input type="hidden" id="newsId" name="id">
+	                
+	                <div class="form-group">
+	                    <label for="newsTitulo">Título *</label>
+	                    <input type="text" id="newsTitulo" name="titulo" class="form-control" 
+	                           placeholder="Titulo" required>
+	                </div>
+	                
+	                <div class="form-row">
+	                    <div class="form-group col-md-6">
+	                        <label for="newsAutor">Autor *</label>
+	                        <input type="text" id="newsAutor" name="autor" class="form-control"
+							 placeholder="Autor" required>
+	                    </div>
+	                    <div class="form-group col-md-6">
+	                        <label for="newsFuente">Fuente *</label>
+	                        <input type="text" id="newsFuente" name="fuente" class="form-control" 
+	                               placeholder="Nombre del medio o publicación original">
+	                    </div>
+	                </div>
+	                
+	                <div class="form-group">
+	                    <label for="newsUrl">URL Original</label>
+	                    <input type="url" id="newsUrl" name="url" class="form-control" 
+	                           placeholder="URL Original (https://ejemplo.com/noticia-original)">
+	                </div>
+	                
+	                <div class="form-row">
+	                    <div class="form-group col-md-6">
+	                        <label for="newsCategoria">Categoría *</label>
+	                        <select id="newsCategoria" name="categoria" class="form-control" required>
+	                            <option value="">Seleccione una categoría</option>
+	                            <option value="TECNOLOGIA">Tecnología</option>
+	                            <option value="CIENCIA">Ciencia</option>
+	                            <option value="CULTURA">Cultura</option>
+	                            <option value="DEPORTES">Deportes</option>
+	                            <option value="POLITICA">Política</option>
+	                        </select>
+	                    </div>
+	                    <div class="form-group col-md-6">
+	                        <label for="newsEstado">Estado *</label>
+	                        <select id="newsEstado" name="estado" class="form-control" required>
+	                            <option value="PUBLICADO">Publicado</option>
+	                            <option value="BORRADOR">Borrador</option>
+	                            <option value="ARCHIVADO">Archivado</option>
+	                        </select>
+	                    </div>
+	                </div>
+	                
+	                <div class="form-group">
+	                    <label for="newsImagen">URL de la Imagen</label>
+	                    <input type="url" id="newsImagen" name="imagen" class="form-control" 
+	                           placeholder="https://ejemplo.com/imagen.jpg">
+	                    <small class="form-text">Usa una imagen con relación de aspecto 16:9 para mejores resultados</small>
+	                </div>
+	                
+	                <div class="form-group">
+	                    <label for="newsDescripcion">Descripción *</label>
+	                    <textarea id="newsDescripcion" name="descripcion" class="form-control" rows="3" 
+	                              placeholder="Resumen breve de la noticia" required></textarea>
+	                </div>
+	                
+	                <div class="form-group">
+	                    <label for="newsContenido">Contenido Completo *</label>
+	                    <textarea id="newsContenido" name="contenido" class="form-control" rows="6" 
+	                              placeholder="Escribe aquí el contenido completo de la noticia..." required></textarea>
+	                </div>
+	            </div>
+	            
+	            <div class="modal-footer">
+	                <button type="button" class="btn btn-secondary cancel-modal">
+	                    <i class="fas fa-times"></i> Cancelar
+	                </button>
+	                <button type="submit" class="btn btn-primary">
+	                    <i class="fas fa-save"></i> Guardar Noticia
+	                </button>
+	            </div>
+	        </form>
+	    </div>
+	</div>
+	
+	<style>
+	 
+	
+	    .news-management-container {
+	        padding: 2rem;
+	        max-width: 1200px;
+	        margin: 0 auto;
+	    }
+	
+	    /* Encabezado */
+	    .news-header {
+	        margin-bottom: 2rem;
+	        text-align: center;
+	    }
+	
+	
+	    .header-actions {
+	        display: flex;
+	        justify-content: space-between;
+	        margin-top: 1.5rem;
+	    }
+	
+	    /* Grid de noticias */
+	    .news-grid {
+	        display: grid;
+	        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+	        gap: 1.5rem;
+	    }
+	
+	    /* Tarjetas de noticias */
+	    .news-card {
+	        background: white;
+	        border-radius: var(--radius);
+	        box-shadow: var(--box-shadow);
+	        overflow: hidden;
+	        display: flex;
+	        flex-direction: column;
+	        transition: transform 0.3s ease;
+	    }
+	
+	    .news-card:hover {
+	        transform: translateY(-5px);
+	    }
+	
+	    .news-card-header {
+	        background-color: var(--primary-color);
+	        color: white;
+	        padding: 1rem;
+	        position: relative;
+	    }
+	
+	    .news-card-id {
+	        position: absolute;
+	        top: 10px;
+	        right: 10px;
+	        background-color: rgba(255,255,255,0.2);
+	        padding: 0.25rem 0.5rem;
+	        border-radius: 20px;
+	        font-size: 0.8rem;
+	    }
+	
+	    .news-card-title {
+	        font-family: 'Montserrat', sans-serif;
+	        font-size: 1.25rem;
+	        margin: 0.5rem 0;
+	    }
+	
+	    .news-card-meta {
+	        display: flex;
+	        justify-content: space-between;
+	        font-size: 0.8rem;
+	        margin-top: 0.5rem;
+	    }
+	
+	    .news-card-body {
+	        padding: 1.25rem;
+	        flex-grow: 1;
+	    }
+	
+	    .news-detail {
+	        display: flex;
+	        justify-content: space-between;
+	        margin-bottom: 0.75rem;
+	        font-size: 0.9rem;
+	    }
+	
+	    .news-detail-label {
+	        font-weight: 600;
+	    }
+	
+	    .news-descripcion {
+	        margin: 1rem 0;
+	        font-size: 0.9rem;
+	        line-height: 1.5;
+	    }
+	
+	    .news-image-preview {
+	        margin: 1rem 0;
+	        text-align: center;
+	    }
+	
+	    .news-image-preview img {
+	        max-width: 100%;
+	        height: auto;
+	        border-radius: 4px;
+	        border: 1px solid #eee;
+	    }
+	
+	    .news-stats {
+	        display: flex;
+	        gap: 1rem;
+	        margin-top: 1rem;
+	        font-size: 0.85rem;
+	        color: #666;
+	    }
+	
+	    .publicado {
+	        color: #28a745;
+	    }
+	
+	    .borrador {
+	        color: #ffc107;
+	    }
+	
+	    .archivado {
+	        color: #6c757d;
+	    }
+	
+	    .news-card-footer {
+	        padding: 1rem;
+	        background-color: var(--secondary-color);
+	        border-top: 1px solid #ddd;
+	        display: flex;
+	        justify-content: space-between;
+	        align-items: center;
+	    }
+	
+	    .footer-actions {
+	        display: flex;
+	        gap: 0.5rem;
+	    }
+	
+	    /* Botones */
+	   
+	
+	   
+	    /* Modal */
+	    .modal-overlay {
+	        position: fixed;
+	        top: 0;
+	        left: 0;
+	        right: 0;
+	        bottom: 0;
+	        background-color: rgba(0,0,0,0.5);
+	        display: none;
+	        justify-content: center;
+	        align-items: center;
+	        z-index: 1000;
+	        padding: 1rem;
+	    }
+	
+	    .modal-container {
+	        background: white;
+	        border-radius: var(--radius);
+	        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+	        width: 100%;
+	        max-width: 800px;
+	        max-height: 90vh;
+	        overflow-y: auto;
+	    }
+	
+	    .modal-header {
+	        background-color: var(--primary-color);
+	        color: white;
+	        padding: 1.25rem;
+	        display: flex;
+	        justify-content: space-between;
+	        align-items: center;
+	        position: sticky;
+	        top: 0;
+	        z-index: 10;
+	    }
+	
+	    .modal-header h3 {
+	        margin: 0;
+	        font-family: 'Montserrat', sans-serif;
+	    }
+	
+	    .modal-close {
+	        background: none;
+	        border: none;
+	        color: white;
+	        font-size: 1.5rem;
+	        cursor: pointer;
+	    }
+	
+	    .modal-body {
+	        padding: 1.5rem;
+	    }
+	
+	    .modal-footer {
+	        padding: 1rem;
+	        background-color: var(--secondary-color);
+	        border-top: 1px solid #ddd;
+	        display: flex;
+	        justify-content: flex-end;
+	        gap: 0.75rem;
+	        position: sticky;
+	        bottom: 0;
+	    }
+	
+	    /* Formulario */
+	    .form-group {
+	        margin-bottom: 1.25rem;
+	    }
+	
+	    .form-control {
+	        width: 100%;
+	        padding: 0.75rem;
+	        border: 1px solid #ddd;
+	        border-radius: var(--radius);
+	        font-family: 'Inter', sans-serif;
+	    }
+	
+	    .form-control:focus {
+	        border-color: var(--accent-color);
+	        outline: none;
+	        box-shadow: 0 0 0 3px rgba(94, 54, 184, 0.1);
+	    }
+	
+	    textarea.form-control {
+	        min-height: 120px;
+	        resize: vertical;
+	    }
+	
+	    .form-row {
+	        display: flex;
+	        gap: 1rem;
+	        margin-bottom: 1rem;
+	    }
+	
+	    .col-md-6 {
+	        flex: 1;
+	    }
+	
+	    .form-text {
+	        color: #6c757d;
+	        font-size: 0.85rem;
+	        margin-top: 0.25rem;
+	    }
+	
+	    select.form-control {
+	        appearance: none;
+	        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+	        background-repeat: no-repeat;
+	        background-position: right 0.75rem center;
+	        background-size: 16px 12px;
+	        padding-right: 2.5rem;
+	    }
+	</style>
+	
+	<script>
+	$(document).ready(function() {
+	    // Mostrar modal para nueva noticia
+	    $('#addNewsBtn').click(function() {
+	        $('#newsForm')[0].reset();
+	        $('#newsId').val('');
+	        $('#modalTitle').text('Añadir Nueva Noticia');
+	        $('#newsForm').attr('action', '@routes.AdminController.crearNoticia()');
+	        $('#newsModal').show();
+	    });
+	
+	    // Mostrar modal para editar noticia
+	    $('.edit-news').click(function() {
+	        var newsId = $(this).data('id');
+	        $.get('/admin/noticia/' + newsId, function(data) {
+	            $('#modalTitle').text('Editar Noticia');
+	            $('#newsId').val(data.idNoticia);
+	            $('#newsTitulo').val(data.titulo);
+	            $('#newsAutor').val(data.autor);
+	            $('#newsFuente').val(data.fuente);
+	            $('#newsUrl').val(data.url);
+	            $('#newsCategoria').val(data.categoria);
+	            $('#newsEstado').val(data.estado);
+	            $('#newsImagen').val(data.imagen);
+	            $('#newsDescripcion').val(data.descripcion);
+	            $('#newsContenido').val(data.contenido);
+	            
+	            $('#newsForm').attr('action', '/admin/noticia/' + data.idNoticia);
+	            $('#newsModal').show();
+	        });
+	    });
+	
+	    // Ocultar modal
+	    $('.modal-close, .cancel-modal').click(function() {
+	        $('#newsModal').hide();
+	    });
+	
+	    // Enviar formulario
+	    $('#newsForm').submit(function(e) {
+	        e.preventDefault();
+	        var formData = $(this).serialize();
+	        var url = $(this).attr('action');
+	        var method = $('#newsId').val() ? 'PUT' : 'POST';
+	        
+	        $.ajax({
+	            url: url,
+	            type: method,
+	            data: formData,
+	            success: function() {
+	                $('#newsModal').hide();
+	                location.reload();
+	            },
+	            error: function(xhr) {
+	                alert('Error: ' + xhr.responseText);
+	            }
+	        });
+	    });
+	
+	    // Eliminar noticia
+	    $('.delete-news').click(function() {
+	        if (confirm('¿Estás seguro de eliminar esta noticia?')) {
+	            var newsId = $(this).data('id');
+	            $.ajax({
+	                url: '/admin/noticia/' + newsId,
+	                type: 'DELETE',
+	                success: function() {
+	                    location.reload();
+	                },
+	                error: function() {
+	                    alert('Error al eliminar la noticia');
+	                }
+	            });
+	        }
+	    });
+	});
+	</script>
+	}

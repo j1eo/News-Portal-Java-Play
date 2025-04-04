@@ -28,6 +28,19 @@ GET     /admin/usuario/:id      controllers.AdminController.obtenerUsuario(id: L
 PUT     /admin/usuario/:id      controllers.AdminController.actualizarUsuario(id: Long)
 DELETE  /admin/usuario/:id      controllers.AdminController.eliminarUsuario(id: Long)
 PUT     /admin/articulo/:id/estado controllers.AdminController.cambiarEstadoArticulo(id: Long, estado: String)
+# Admin Articles Management
+GET     /admin/articulos                  controllers.AdminController.gestionarArticulos()
+GET     /admin/articulo/:id               controllers.AdminController.obtenerArticulo(id: Long)
+POST    /admin/articulo                   controllers.AdminController.crearArticulo()
+PUT     /admin/articulo/:id               controllers.AdminController.actualizarArticulo(id: Long)
+DELETE  /admin/articulo/:id               controllers.AdminController.eliminarArticulo(id: Long)
+
+# Admin News Management
+GET     /admin/noticias                  controllers.AdminController.gestionarNoticias()
+GET     /admin/noticia/:id               controllers.AdminController.obtenerNoticia(id: Long)
+POST    /admin/noticia                   controllers.AdminController.crearNoticia()
+PUT     /admin/noticia/:id               controllers.AdminController.actualizarNoticia(id: Long)
+DELETE  /admin/noticia/:id               controllers.AdminController.eliminarNoticia(id: Long)
 
 # News & Articles
 GET     /noticias               controllers.NoticiasController.obtenerNoticias()
@@ -50,3 +63,4 @@ DELETE  /noticias-propias/:id                   controllers.NoticiasPropiasContr
 
 # Assets
 GET     /assets/*file           controllers.Assets.versioned(path="/public", file: Asset)
+GET     /api/check-role      controllers.NoticiasPropiasController.verificarRol()
