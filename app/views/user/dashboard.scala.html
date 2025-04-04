@@ -1,6 +1,8 @@
 @(usuario: models.Usuario, articulosPublicados: List[models.Articulo], message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
 
 @userbanner("Panel de Usuario", message) {
+	<div id="overlay">
+				</div>
     
     <main class="dashboard-main">
         <div class="user-dashboard-container">

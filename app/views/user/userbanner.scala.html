@@ -72,26 +72,23 @@
         <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
         
         <!-- Script inline como respaldo -->
-        <script>
-        // Definir funciones globales si no están en main.js
-        if (typeof openNav !== 'function') {
-            window.openNav = function() {
-                document.getElementById("mySidenav").style.width = "450px";
-                document.getElementById("navOverlay").style.display = "block";
-                document.body.style.overflow = "hidden";
-            };
-        }
+		<script>
+					document.getElementById("overlay").addEventListener("click", closeNav);
+
+						function openNav() {
+						    document.getElementById("mySidenav").style.width = "450px";
+						    document.getElementById("overlay").style.display = "block"; // Mostrar el overlay
+						}
+
+						function closeNav() {
+						    document.getElementById("mySidenav").style.width = "0";
+						    document.getElementById("overlay").style.display = "none"; // Ocultar el overlay
+						}
+
+					    // Eventos para el sidenav
+					    document.querySelector(".closebtn").addEventListener("click", closeNav);
+					    document.querySelector("[onclick='openNav()']").addEventListener("click", openNav);
+				        </script>
         
-        if (typeof closeNav !== 'function') {
-            window.closeNav = function() {
-                document.getElementById("mySidenav").style.width = "0";
-                document.getElementById("navOverlay").style.display = "none";
-                document.body.style.overflow = "auto";
-            };
-        }
-        
-        // Event listener para el overlay
-        document.getElementById('navOverlay')?.addEventListener('click', closeNav);
-        </script>
     </body>
 </html>

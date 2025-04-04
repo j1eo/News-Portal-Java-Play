@@ -205,4 +205,5 @@ public class NoticiasPropiasController extends Controller {
             return internalServerError();
         }
     }
+    
 }

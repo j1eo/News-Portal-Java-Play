@@ -47,6 +47,26 @@
         </div>
 
         <!-- Contenido dinámico de la página -->
+	
         @content
+		<script src="@routes.Assets.versioned("javascripts/main.js")"></script>
+		<script>
+			document.getElementById("overlay").addEventListener("click", closeNav);
+
+				function openNav() {
+				    document.getElementById("mySidenav").style.width = "450px";
+				    document.getElementById("overlay").style.display = "block"; // Mostrar el overlay
+				}
+
+				function closeNav() {
+				    document.getElementById("mySidenav").style.width = "0";
+				    document.getElementById("overlay").style.display = "none"; // Ocultar el overlay
+				}
+
+			    // Eventos para el sidenav
+			    document.querySelector(".closebtn").addEventListener("click", closeNav);
+			    document.querySelector("[onclick='openNav()']").addEventListener("click", openNav);
+		        </script>
+		       
     </body>
 </html>
