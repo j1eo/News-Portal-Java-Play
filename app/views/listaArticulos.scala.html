@@ -1,6 +1,6 @@
 @(articulos: List[models.Articulo], usuario: models.Usuario, message: String)(implicit request: play.mvc.Http.Request)
 
-@main("Listado de Artículos - UR NEWS", message) {
+@user.userbanner("Listado de Artículos - UR NEWS", message) {
     <div class="container">
         <h1>Artículos Recientes</h1>
         

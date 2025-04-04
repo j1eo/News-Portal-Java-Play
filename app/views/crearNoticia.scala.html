@@ -1,22 +1,22 @@
 @(usuario: models.Usuario, message: String)(implicit request: play.mvc.Http.Request)
 
-@user.userbanner("Crear Nuevo Artículo - UR NEWS", message) {
+@user.userbanner("Crear Nueva Noticia - UR NEWS", message) {
     <div class="container">
-        <h1>Crear Nuevo Artículo</h1>
+        <h1>Crear Nueva Noticia</h1>
         
-        <form id="form-crear-articulo" class="article-form" action="@routes.ArticulosController.crearArticulo()" method="POST">
+        <form id="form-crear-noticia" class="article-form" action="@routes.NoticiasPropiasController.crearNoticia()" method="POST">
             @if(usuario != null) {
                 <input type="hidden" name="autor" value="@usuario.getNombre()">
             }
             
             <div class="form-group">
                 <label for="titulo">Título *</label>
-                <input type="text" id="titulo" name="titulo" required class="form-control" placeholder="Ej: Las últimas tendencias en tecnología">
+                <input type="text" id="titulo" name="titulo" required class="form-control" placeholder="Ej: Descubrimiento científico revoluciona la medicina">
             </div>
             
             <div class="form-group">
                 <label for="contenido">Contenido *</label>
-                <textarea id="contenido" name="contenido" required class="form-control" rows="10" placeholder="Escribe aquí el contenido de tu artículo..."></textarea>
+                <textarea id="contenido" name="contenido" required class="form-control" rows="10" placeholder="Escribe aquí el contenido completo de tu noticia..."></textarea>
             </div>
             
             <div class="form-row">
@@ -29,6 +29,7 @@
                         <option value="CULTURA">Cultura</option>
                         <option value="DEPORTES">Deportes</option>
                         <option value="POLITICA">Política</option>
+                        <option value="INTERNACIONAL">Internacional</option>
                     </select>
                 </div>
                 
@@ -37,6 +38,7 @@
                     <select id="estado" name="estado" class="form-control" required>
                         <option value="BORRADOR">Borrador</option>
                         <option value="PUBLICADO">Publicado</option>
+                        <option value="PENDIENTE">Pendiente de revisión</option>
                     </select>
                 </div>
             </div>
@@ -47,11 +49,26 @@
                 <small class="text-muted">Usa una imagen con relación de aspecto 16:9 para mejores resultados</small>
             </div>
             
+            <div class="form-group">
+                <label for="fuente">Fuente (opcional)</label>
+                <input type="text" id="fuente" name="fuente" class="form-control" placeholder="Nombre del medio o publicación original">
+            </div>
+            
+            <div class="form-group">
+                <label for="url">URL de la noticia original (opcional)</label>
+                <input type="url" id="url" name="url" class="form-control" placeholder="https://ejemplo.com/noticia-original">
+            </div>
+            
+            <div class="form-group">
+                <label for="descripcion">Descripción breve (opcional)</label>
+                <textarea id="descripcion" name="descripcion" class="form-control" rows="3" placeholder="Resumen breve de la noticia (aparecerá en listados)"></textarea>
+            </div>
+            
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-paper-plane"></i> Publicar Artículo
+                    <i class="fas fa-paper-plane"></i> Publicar Noticia
                 </button>
-                <a href="@routes.ArticulosController.listarArticulos()" class="btn btn-secondary">
+                <a href="@routes.NoticiasPropiasController.listarNoticias()" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
             </div>
@@ -156,13 +173,14 @@
 
     <script>
         // Validación básica del formulario
-        document.getElementById('form-crear-articulo').addEventListener('submit', function(e) {
+        document.getElementById('form-crear-noticia').addEventListener('submit', function(e) {
             const titulo = document.getElementById('titulo').value.trim();
             const contenido = document.getElementById('contenido').value.trim();
+            const categoria = document.getElementById('categoria').value;
             
-            if (!titulo || !contenido) {
+            if (!titulo || !contenido || !categoria) {
                 e.preventDefault();
-                alert('Por favor complete todos los campos requeridos');
+                alert('Por favor complete todos los campos requeridos (Título, Contenido y Categoría)');
             }
         });
     </script>

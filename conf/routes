@@ -37,5 +37,16 @@ GET     /articulo/:id           controllers.ArticulosController.mostrarArticulo(
 GET     /articulos/nuevo        controllers.ArticulosController.mostrarFormularioCreacion()
 DELETE  /articulo/:id           controllers.ArticulosController.eliminarArticulo(id: Integer)
 
+# Comentarios
+POST    /comentario/articulo    controllers.ComentariosController.agregarComentarioArticulo()
+POST    /comentario/noticia     controllers.ComentariosController.agregarComentarioNoticia()
+
+# Noticias Propias
+GET     /noticias-propias/crear                 controllers.NoticiasPropiasController.mostrarFormularioCreacion()
+GET     /noticias-propias                       controllers.NoticiasPropiasController.listarNoticias()
+POST    /noticias-propias                       controllers.NoticiasPropiasController.crearNoticia()
+GET     /noticias-propias/:id                   controllers.NoticiasPropiasController.mostrarNoticia(id: Integer)
+DELETE  /noticias-propias/:id                   controllers.NoticiasPropiasController.eliminarNoticia(id: Integer)
+
 # Assets
 GET     /assets/*file           controllers.Assets.versioned(path="/public", file: Asset)

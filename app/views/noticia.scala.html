@@ -1,0 +1,154 @@
+@(noticia: models.NoticiaPropia, relacionados: List[NoticiaPropia], usuario: models.Usuario, message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
+
+@user.userbanner("Detalle de Noticia", message) {
+    <div class="user-dashboard-container">
+        <!-- Barra superior con información de usuario -->
+        @if(usuario != null && usuario.getNombre() != null) {
+            <div class="user-header">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Bienvenido, <strong>@usuario.getNombre()</strong></span>
+                </div>
+                <a href="@routes.AuthController.logout()" class="logout-btn" onclick="return confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </a>
+            </div>
+        } else {
+            <div class="user-header">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Bienvenido, <strong>Invitado</strong></span>
+                </div>
+            </div>
+        }
+
+        <!-- Contenido principal del dashboard -->
+        <div class="dashboard-content">
+            <div class="article-detail-container">
+                <!-- Ruta de navegación -->
+                <div class="article-breadcrumb">
+                    <a href="@routes.UserController.dashboard()">Dashboard</a> > 
+                    <a href="@routes.NoticiasPropiasController.listarNoticias()">Noticias</a> > 
+                    <span>@noticia.getTitulo()</span>
+                </div>
+
+                <!-- Contenido principal de la noticia -->
+                <article class="article-content">
+                    <div class="article-header">
+                        <h1>@noticia.getTitulo()</h1>
+                        <div class="article-meta-info">
+                            <span class="author">Por @noticia.getAutor()</span>
+                            <span class="date">@noticia.getFechaPublicacion()</span>
+                            <span class="category">@noticia.getCategoria()</span>
+                            @if(noticia.getFuente() != null && !noticia.getFuente().isEmpty()) {
+                                <span class="source">Fuente: @noticia.getFuente()</span>
+                            }
+                        </div>
+                    </div>
+
+                    @if(noticia.getImagen() != null && !noticia.getImagen().isEmpty()) {
+                        <div class="article-main-image">
+                            <img src="@noticia.getImagen()" alt="@noticia.getTitulo()">
+                        </div>
+                    }
+
+                    <div class="article-body-content">
+                        @Html(noticia.getContenido())
+                    </div>
+
+                    @if(noticia.getUrl() != null && !noticia.getUrl().isEmpty()) {
+                        <div class="article-external-link">
+                            <a href="@noticia.getUrl()" target="_blank" class="action-btn">
+                                <i class="fas fa-external-link-alt"></i> Ver noticia original
+                            </a>
+                        </div>
+                    }
+
+                    <div class="article-actions-container">
+                        <button class="action-btn">
+                            <i class="fas fa-thumbs-up"></i> Me gusta (@noticia.getMeGusta())
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-thumbs-down"></i> No me gusta (@noticia.getNoMeGusta())
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-share-alt"></i> Compartir
+                        </button>
+                        <button class="action-btn">
+                            <i class="fas fa-bookmark"></i> Guardar
+                        </button>
+                    </div>
+                </article>
+
+                <!-- Noticias relacionadas -->
+                @if(!relacionados.isEmpty()) {
+                    <section class="article-related-section">
+                        <h2><i class="fas fa-link"></i> Noticias relacionadas</h2>
+                        <div class="article-related-grid">
+                            @for(rel <- relacionados) {
+                                <div class="article-related-item">
+                                    @if(rel.getImagen() != null && !rel.getImagen().isEmpty()) {
+                                        <img src="@rel.getImagen()" alt="@rel.getTitulo()">
+                                    }
+                                    <h3>@rel.getTitulo()</h3>
+                                    <a href="@routes.NoticiasPropiasController.mostrarNoticia(rel.getIdNoticia())" class="action-btn">
+                                        <i class="fas fa-book-reader"></i> Leer más
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </section>
+                }
+
+                <!-- Sección de comentarios -->
+                <section class="article-comments-section">
+                    <h2><i class="fas fa-comments"></i> Comentarios</h2>
+                    <div class="article-comment-form">
+                        <textarea placeholder="Escribe tu comentario..."></textarea>
+                        <button class="action-btn">
+                            <i class="fas fa-paper-plane"></i> Publicar comentario
+                        </button>
+                    </div>
+                    <div class="comments-list">
+                        <p>No hay comentarios aún. Sé el primero en comentar.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Estilos similares a los de artículo, con algunas adaptaciones */
+        .article-external-link {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .article-external-link .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background-color: #5E36B8;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .article-external-link .action-btn:hover {
+            background-color: #7a52d1;
+        }
+        
+        .source {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+    
+    <script>
+        function confirmLogout() {
+            return confirm("¿Estás seguro que deseas cerrar sesión?");
+        }
+    </script>
+}

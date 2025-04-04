@@ -1,0 +1,208 @@
+@(noticias: List[NoticiaPropia], usuario: models.Usuario, message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
+
+@user.userbanner("Lista de Noticias", message) {
+    <div class="user-dashboard-container">
+        <!-- Barra superior con información de usuario -->
+        @if(usuario != null && usuario.getNombre() != null) {
+            <div class="user-header">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Bienvenido, <strong>@usuario.getNombre()</strong></span>
+                </div>
+                <a href="@routes.AuthController.logout()" class="logout-btn" onclick="return confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </a>
+            </div>
+        } else {
+            <div class="user-header">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Bienvenido, <strong>Invitado</strong></span>
+                </div>
+            </div>
+        }
+
+        <!-- Contenido principal del dashboard -->
+        <div class="dashboard-content">
+            <div class="news-list-container">
+                <!-- Ruta de navegación -->
+                <div class="news-breadcrumb">
+                    <a href="@routes.UserController.dashboard()">Dashboard</a> > 
+                    <span>Noticias</span>
+                </div>
+
+                <!-- Título y botón de creación (solo para usuarios autenticados) -->
+                <div class="news-list-header">
+                    <h1><i class="fas fa-newspaper"></i> Últimas Noticias</h1>
+                    @if(usuario != null) {
+                        <a href="@routes.NoticiasPropiasController.mostrarFormularioCreacion()" class="action-btn">
+                            <i class="fas fa-plus"></i> Crear Noticia
+                        </a>
+                    }
+                </div>
+
+                <!-- Lista de noticias -->
+                <div class="news-grid">
+                    @for(noticia <- noticias) {
+                        <div class="news-item">
+                            @if(noticia.getImagen() != null && !noticia.getImagen().isEmpty()) {
+                                <div class="news-image">
+                                    <img src="@noticia.getImagen()" alt="@noticia.getTitulo()">
+                                </div>
+                            }
+                            <div class="news-content">
+                                <h2>@noticia.getTitulo()</h2>
+                                <div class="news-meta">
+                                    <span class="author">@noticia.getAutor()</span>
+                                    <span class="date">@noticia.getFechaPublicacion()</span>
+                                    <span class="category">@noticia.getCategoria()</span>
+                                </div>
+                                @if(noticia.getDescripcion() != null && !noticia.getDescripcion().isEmpty()) {
+                                    <p class="news-description">@noticia.getDescripcion()</p>
+                                }
+                                <a href="@routes.NoticiasPropiasController.mostrarNoticia(noticia.getIdNoticia())" class="read-more-btn">
+                                    <i class="fas fa-book-reader"></i> Leer más
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .news-list-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #eaeaea;
+        }
+
+        .news-breadcrumb {
+            margin-bottom: 25px;
+            font-size: 0.9em;
+            color: #666;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .news-breadcrumb a {
+            color: #5E36B8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .news-breadcrumb a:hover {
+            color: #7a52d1;
+            text-decoration: underline;
+        }
+
+        .news-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .news-list-header h1 {
+            font-size: 1.8em;
+            color: #1E1E1E;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .news-list-header h1 i {
+            color: #5E36B8;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .news-item {
+            background: white;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .news-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .news-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .news-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .news-item:hover .news-image img {
+            transform: scale(1.05);
+        }
+
+        .news-content {
+            padding: 20px;
+        }
+
+        .news-content h2 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .news-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .news-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .read-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 15px;
+            background-color: #5E36B8;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+
+        .read-more-btn:hover {
+            background-color: #7a52d1;
+            color: white;
+        }
+    </style>
+    
+    <script>
+        function confirmLogout() {
+            return confirm("¿Estás seguro que deseas cerrar sesión?");
+        }
+    </script>
+}

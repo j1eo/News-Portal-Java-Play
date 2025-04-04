@@ -70,17 +70,27 @@ public class AdminService {
             conn.setAutoCommit(false);
             
             // Actualizar cuenta
-            String sqlCuenta = "UPDATE Cuenta SET Nombre = ?, Apellidos = ?, Email = ? WHERE ID_Cuenta = ?";
+            String sqlCuenta = "UPDATE Cuenta SET "
+                + "Nombre = ?, "
+                + "Apellidos = ?, "
+                + "Email = ?, "
+                + "FotoPerfil = ? "
+                + "WHERE ID_Cuenta = ?";
+            
             try (PreparedStatement stmt = conn.prepareStatement(sqlCuenta)) {
                 stmt.setString(1, usuario.getNombre());
                 stmt.setString(2, usuario.getApellidos());
                 stmt.setString(3, usuario.getEmail());
-                stmt.setInt(4, usuario.getIdCuenta());
+                stmt.setString(4, usuario.getFotoPerfil());
+                stmt.setInt(5, usuario.getIdCuenta());
                 stmt.executeUpdate();
             }
             
             // Actualizar usuario
-            String sqlUsuario = "UPDATE Usuario SET Suscripcion = ? WHERE ID_Usuario = ?";
+            String sqlUsuario = "UPDATE Usuario SET "
+                + "Suscripcion = ? "
+                + "WHERE ID_Usuario = ?";
+            
             try (PreparedStatement stmt = conn.prepareStatement(sqlUsuario)) {
                 stmt.setString(1, usuario.getSuscripcion());
                 stmt.setInt(2, usuario.getIdUsuario());
@@ -94,6 +104,27 @@ public class AdminService {
             throw e;
         } finally {
             if (conn != null) conn.setAutoCommit(true);
+        }
+    }
+    
+    public boolean actualizarAdmin(Admin admin) throws SQLException {
+        String sql = "UPDATE Cuenta SET "
+            + "Nombre = ?, "
+            + "Apellidos = ?, "
+            + "Email = ?, "
+            + "FotoPerfil = ? "
+            + "WHERE ID_Cuenta = ?";
+        
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, admin.getNombre());
+            stmt.setString(2, admin.getApellidos());
+            stmt.setString(3, admin.getEmail());
+            stmt.setString(4, admin.getFotoPerfil());
+            stmt.setInt(5, admin.getIdCuenta());
+            
+            return stmt.executeUpdate() > 0;
         }
     }
 

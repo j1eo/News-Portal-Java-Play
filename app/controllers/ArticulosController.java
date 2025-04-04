@@ -1,33 +1,47 @@
 package controllers;
 
+
 import com.fasterxml.jackson.databind.JsonNode;
 import models.Articulo;
+import models.Comentario;
 import models.Usuario;
 import play.Logger;
 import play.libs.Json;
 import play.mvc.*;
 import services.ArticuloService;
+import services.ComentarioService;
 import services.AuthService;
 import services.JwtService;
 import controllers.Secured;
 import play.mvc.Http.Cookie;
+import play.data.Form;
+import play.data.DynamicForm;
+import play.data.FormFactory;
 
 import javax.inject.Inject;
 import java.sql.SQLException;
 import java.util.List;
 
 public class ArticulosController extends Controller {
-
     private final ArticuloService articuloService;
+    private final ComentarioService comentarioService;
     private final JwtService jwtService;
     private final AuthService authService;
+    private final FormFactory formFactory;
 
     @Inject
-    public ArticulosController(ArticuloService articuloService, JwtService jwtService, AuthService authService) {
+    public ArticulosController(ArticuloService articuloService, 
+                             ComentarioService comentarioService,
+                             JwtService jwtService,
+                             AuthService authService,
+                             FormFactory formFactory) {
         this.articuloService = articuloService;
+        this.comentarioService = comentarioService;
         this.jwtService = jwtService;
         this.authService = authService;
+        this.formFactory = formFactory;
     }
+
 
     // Método para obtener usuario completo (igual que en UserController)
     private Usuario obtenerUsuarioCompleto() {
@@ -116,32 +130,30 @@ public class ArticulosController extends Controller {
         try {
             Usuario usuario = obtenerUsuarioCompleto();
             if (usuario == null) {
-                return unauthorized("Token inválido");
+                return unauthorized("Debes iniciar sesión");
             }
 
-            // Verificar rol de usuario
-            String userRole = jwtService.obtenerUserRole(request().cookie("jwt").value());
-            if (!"AUTOR".equals(userRole) && !"ADMIN".equals(userRole)) {
-                return forbidden("No tienes permisos para esta acción");
+            // Obtener datos del formulario (ahora de form-urlencoded)
+            DynamicForm form = formFactory.form().bindFromRequest();
+            
+            String titulo = form.get("titulo");
+            String contenido = form.get("contenido");
+            String imagen = form.get("imagen");
+            String categoria = form.get("categoria");
+            String estado = form.get("estado");
+            
+            if (titulo == null || contenido == null || categoria == null) {
+                return badRequest("Faltan campos requeridos");
             }
 
-            JsonNode json = request().body().asJson();
-            if (json == null) {
-                return badRequest("Se esperaba JSON");
-            }
-
-            // Obtener datos del formulario
-            String titulo = json.get("titulo").asText();
-            String contenido = json.get("contenido").asText();
-            String imagen = json.has("imagen") ? json.get("imagen").asText() : null;
-            String categoria = json.get("categoria").asText();
-            String estado = json.get("estado").asText();
-            String autor = json.has("autor") ? json.get("autor").asText() : usuario.getNombre();
+            // Establecer valores por defecto si son nulos
+            if (imagen == null) imagen = "";
+            if (estado == null) estado = "PUBLICADO";
 
             boolean creado = articuloService.agregarArticulo(
                 usuario.getIdUsuario(),
                 titulo,
-                autor,
+                usuario.getNombre(), // Autor es el usuario actual
                 contenido,
                 imagen,
                 estado,
@@ -150,11 +162,16 @@ public class ArticulosController extends Controller {
                 0  // noMeGusta inicial
             );
 
-            return creado ? created("Artículo creado") : internalServerError("Error al crear artículo");
+            if (creado) {
+            	flash("success", "Articulo creado exitosamente");
+                return redirect(routes.ArticulosController.listarArticulos());
+            } else {
+                return badRequest("Error al crear el artículo");
+            }
             
         } catch (Exception e) {
             Logger.error("Error al crear artículo", e);
-            return badRequest("Datos inválidos: " + e.getMessage());
+            return badRequest("Error: " + e.getMessage());
         }
     }
 
@@ -167,7 +184,7 @@ public class ArticulosController extends Controller {
             }
 
             // Solo ADMIN puede eliminar
-            if (!"ADMIN".equals(jwtService.obtenerUserRole(request().cookie("jwt").value()))) {
+            if (!"admin".equals(jwtService.obtenerUserRole(request().cookie("jwt").value()))) {
                 return forbidden("Requiere rol de ADMIN");
             }
 
