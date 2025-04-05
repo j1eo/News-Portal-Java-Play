@@ -65,7 +65,15 @@ public class ArticulosController extends Controller {
         try {
             Logger.debug("=== Mostrando artículo ID: " + id + " ===");
             
-            Articulo articulo = articuloService.obtenerArticuloPorId(id);
+            Usuario usuario = obtenerUsuarioCompleto();
+            Articulo articulo;
+            
+            if (usuario != null) {
+                articulo = articuloService.obtenerArticuloPorIdConLikes(id, usuario.getIdUsuario());
+            } else {
+                articulo = articuloService.obtenerArticuloPorId(id);
+            }
+
             if (articulo == null) {
                 Logger.warn("Artículo no encontrado: " + id);
                 return notFound("Artículo no encontrado");
@@ -77,7 +85,6 @@ public class ArticulosController extends Controller {
                 3
             );
 
-            Usuario usuario = obtenerUsuarioCompleto();
             Logger.debug("Usuario obtenido: " + (usuario != null ? usuario.getNombre() : "null"));
 
             return ok(views.html.articulo.render(
@@ -205,6 +212,126 @@ public class ArticulosController extends Controller {
             return internalServerError(Json.newObject()
                 .put("success", false)
                 .put("message", "Error al eliminar artículo"));
+        }
+    }
+ // Método para manejar likes
+    @Security.Authenticated(Secured.class)
+    public Result darLike(int idArticulo) {
+        try {
+            Usuario usuario = obtenerUsuarioCompleto();
+            if (usuario == null) {
+                Logger.error("Intento de like sin usuario autenticado");
+                return unauthorized(Json.newObject()
+                    .put("success", false)
+                    .put("message", "Debes iniciar sesión para esta acción"));
+            }
+
+            Logger.debug("Intentando registrar like - Artículo: {}, Usuario: {}", idArticulo, usuario.getIdUsuario());
+            
+            boolean exito = articuloService.darLikeArticulo(idArticulo, usuario.getIdUsuario());
+            
+            if (exito) {
+                Logger.debug("Like registrado exitosamente");
+                return ok(Json.newObject()
+                    .put("success", true)
+                    .put("message", "Like registrado")
+                    .put("nuevoTotal", articuloService.obtenerArticuloPorId(idArticulo).getMeGusta()));
+            } else {
+                // Obtener más información sobre el fallo
+                Articulo articulo = articuloService.obtenerArticuloPorId(idArticulo);
+                if (articulo != null && articulo.getIdUsuario() == usuario.getIdUsuario()) {
+                    Logger.debug("Usuario intentó dar like a su propio artículo");
+                    return badRequest(Json.newObject()
+                        .put("success", false)
+                        .put("message", "No puedes dar like a tu propio artículo"));
+                }
+                
+                // Verificar si ya existe un like
+                boolean yaDioLike = articuloService.obtenerArticuloPorIdConLikes(idArticulo, usuario.getIdUsuario())
+                    .isUsuarioDioLike();
+                    
+                if (yaDioLike) {
+                    Logger.debug("Usuario ya había dado like anteriormente");
+                    return badRequest(Json.newObject()
+                        .put("success", false)
+                        .put("message", "Ya has dado like a este artículo"));
+                }
+                
+                Logger.warn("No se pudo registrar el like por razones desconocidas");
+                return badRequest(Json.newObject()
+                    .put("success", false)
+                    .put("message", "No se pudo registrar el like. Intenta nuevamente"));
+            }
+        } catch (SQLException e) {
+            Logger.error("Error de base de datos al registrar like", e);
+            return internalServerError(Json.newObject()
+                .put("success", false)
+                .put("message", "Error en la base de datos"));
+        } catch (Exception e) {
+            Logger.error("Error inesperado al registrar like", e);
+            return internalServerError(Json.newObject()
+                .put("success", false)
+                .put("message", "Error interno del servidor"));
+        }
+    }
+    // Método para manejar dislikes
+    @Security.Authenticated(Secured.class)
+    public Result darNoMeGusta(int idArticulo) {
+        try {
+            Usuario usuario = obtenerUsuarioCompleto();
+            if (usuario == null || usuario.getIdUsuario() <= 0) {
+                Logger.error("Intento de no me gusta sin usuario autenticado");
+                return unauthorized(Json.newObject()
+                    .put("success", false)
+                    .put("message", "Debes iniciar sesión para esta acción"));
+            }
+
+            Logger.debug("Intentando registrar no me gusta - Artículo: {}, Usuario: {}", idArticulo, usuario.getIdUsuario());
+            
+            boolean exito = articuloService.darNoMeGustaArticulo(idArticulo, usuario.getIdUsuario());
+            
+            if (exito) {
+                Logger.debug("No me gusta registrado exitosamente");
+                return ok(Json.newObject()
+                    .put("success", true)
+                    .put("message", "No me gusta registrado")
+                    .put("nuevoTotal", articuloService.obtenerArticuloPorId(idArticulo).getNoMeGusta()));
+            } else {
+                // Obtener más información sobre el fallo
+                Articulo articulo = articuloService.obtenerArticuloPorId(idArticulo);
+                if (articulo != null && articulo.getIdUsuario() == usuario.getIdUsuario()) {
+                    Logger.debug("Usuario intentó dar no me gusta a su propio artículo");
+                    return badRequest(Json.newObject()
+                        .put("success", false)
+                        .put("message", "No puedes dar no me gusta a tu propio artículo"));
+                }
+                
+                // Verificar si ya existe un no me gusta
+                boolean yaDioNoMeGusta = articuloService.obtenerArticuloPorIdConLikes(idArticulo, usuario.getIdUsuario())
+                    .isUsuarioDioNoMeGusta();
+                    
+                if (yaDioNoMeGusta) {
+                    Logger.debug("Usuario ya había dado no me gusta anteriormente");
+                    return badRequest(Json.newObject()
+                        .put("success", false)
+                        .put("message", "Ya has dado no me gusta a este artículo"));
+                }
+                
+                Logger.warn("No se pudo registrar el no me gusta por razones desconocidas");
+                return badRequest(Json.newObject()
+                    .put("success", false)
+                    .put("message", "No se pudo registrar el no me gusta. Intenta nuevamente"));
+            }
+        } catch (SQLException e) {
+            Logger.error("Error de base de datos al registrar no me gusta", e);
+            return internalServerError(Json.newObject()
+                .put("success", false)
+                .put("message", "Error en la base de datos"));
+        } catch (Exception e) {
+            Logger.error("Error inesperado al registrar no me gusta", e);
+            return internalServerError(Json.newObject()
+                .put("success", false)
+                .put("message", "Error interno del servidor"));
         }
     }
 }

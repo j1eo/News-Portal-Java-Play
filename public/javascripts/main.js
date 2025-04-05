@@ -79,59 +79,6 @@ function cargarNoticiasElPais() {
         })
         .catch(error => console.error("Error al cargar noticias de El País:", error));
 }
-// Resto del código (funciones para artículos, likes, etc.) permanece igual...
-// Simulación de registros por usuario
-let registroLikes = {};
-
-
-// Función para toggle "Me gusta"
-function toggleMeGusta(idArticulo) {
-    const botonMeGusta = document.querySelector(`button[onclick="toggleMeGusta(${idArticulo})"]`);
-    const contadorMeGusta = document.getElementById(`me-gusta-${idArticulo}`);
-    const estado = registroLikes[idArticulo];
-
-    if (!estado.meGusta) {
-        // Activar "Me gusta"
-        contadorMeGusta.textContent = parseInt(contadorMeGusta.textContent) + 1;
-        estado.meGusta = true;
-        botonMeGusta.classList.add("active");
-
-        // Si ya tenía "No me gusta", lo desactiva
-        if (estado.noMeGusta) {
-            toggleNoMeGusta(idArticulo);
-        }
-    } else {
-        // Desactivar "Me gusta"
-        contadorMeGusta.textContent = parseInt(contadorMeGusta.textContent) - 1;
-        estado.meGusta = false;
-        botonMeGusta.classList.remove("active");
-    }
-}
-
-// Función para toggle "No me gusta"
-function toggleNoMeGusta(idArticulo) {
-    const botonNoMeGusta = document.querySelector(`button[onclick="toggleNoMeGusta(${idArticulo})"]`);
-    const contadorNoMeGusta = document.getElementById(`no-me-gusta-${idArticulo}`);
-    const estado = registroLikes[idArticulo];
-
-    if (!estado.noMeGusta) {
-        // Activar "No me gusta"
-        contadorNoMeGusta.textContent = parseInt(contadorNoMeGusta.textContent) + 1;
-        estado.noMeGusta = true;
-        botonNoMeGusta.classList.add("active");
-
-        // Si ya tenía "Me gusta", lo desactiva
-        if (estado.meGusta) {
-            toggleMeGusta(idArticulo);
-        }
-    } else {
-        // Desactivar "No me gusta"
-        contadorNoMeGusta.textContent = parseInt(contadorNoMeGusta.textContent) - 1;
-        estado.noMeGusta = false;
-        botonNoMeGusta.classList.remove("active");
-    }
-}
-
 
 function eliminarArticulo(id) {
     fetch(`/articulos/${id}`, { method: "DELETE" })

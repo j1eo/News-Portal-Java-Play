@@ -14,12 +14,16 @@ public class Articulo {
     private String categoria;
     private int meGusta;
     private int noMeGusta;
-    
+    // Nuevos campos para manejar la interacción del usuario
+    private boolean usuarioDioLike;
+    private boolean usuarioDioNoMeGusta;
+    private boolean puedeDarLike; // Para verificar permisos
     public Articulo() {}
 
-    // **Constructor completo**
+    // Constructor completo actualizado
     public Articulo(int idArticulo, int idUsuario, String titulo, String autor, String contenido, String imagen, 
-                    Date fechaPublicacion, String estado, String categoria, int meGusta, int noMeGusta) {
+                    Date fechaPublicacion, String estado, String categoria, int meGusta, int noMeGusta,
+                    boolean usuarioDioLike, boolean usuarioDioNoMeGusta) {
         this.idArticulo = idArticulo;
         this.idUsuario = idUsuario;
         this.titulo = titulo;
@@ -31,6 +35,9 @@ public class Articulo {
         this.categoria = categoria;
         this.meGusta = meGusta;
         this.noMeGusta = noMeGusta;
+        this.usuarioDioLike = usuarioDioLike;
+        this.usuarioDioNoMeGusta = usuarioDioNoMeGusta;
+        this.puedeDarLike = true; // Por defecto true, se puede modificar según lógica de negocio
     }
 
     // Getters y setters
@@ -120,5 +127,68 @@ public class Articulo {
 
     public void setNoMeGusta(int noMeGusta) {
         this.noMeGusta = noMeGusta;
+    }
+    public boolean isUsuarioDioLike() {
+        return usuarioDioLike;
+    }
+
+    public void setUsuarioDioLike(boolean usuarioDioLike) {
+        this.usuarioDioLike = usuarioDioLike;
+    }
+
+    public boolean isUsuarioDioNoMeGusta() {
+        return usuarioDioNoMeGusta;
+    }
+
+    public void setUsuarioDioNoMeGusta(boolean usuarioDioNoMeGusta) {
+        this.usuarioDioNoMeGusta = usuarioDioNoMeGusta;
+    }
+
+    public boolean isPuedeDarLike() {
+        return puedeDarLike;
+    }
+
+    public void setPuedeDarLike(boolean puedeDarLike) {
+        this.puedeDarLike = puedeDarLike;
+    }
+
+    // Método para incrementar likes
+    public void incrementarMeGusta() {
+        this.meGusta++;
+        this.usuarioDioLike = true;
+        // Si tenía dislike, lo quitamos
+        if (this.usuarioDioNoMeGusta) {
+            this.noMeGusta--;
+            this.usuarioDioNoMeGusta = false;
+        }
+    }
+
+    // Método para incrementar dislikes
+    public void incrementarNoMeGusta() {
+        this.noMeGusta++;
+        this.usuarioDioNoMeGusta = true;
+        // Si tenía like, lo quitamos
+        if (this.usuarioDioLike) {
+            this.meGusta--;
+            this.usuarioDioLike = false;
+        }
+    }
+
+    // Método para verificar si el usuario puede interactuar
+    public boolean puedeInteractuar(int idUsuarioActual) {
+        // Un usuario no puede dar like a sus propios artículos
+        return this.idUsuario != idUsuarioActual && this.puedeDarLike;
+    }
+
+    @Override
+    public String toString() {
+        return "Articulo{" +
+                "idArticulo=" + idArticulo +
+                ", titulo='" + titulo + '\'' +
+                ", meGusta=" + meGusta +
+                ", noMeGusta=" + noMeGusta +
+                ", usuarioDioLike=" + usuarioDioLike +
+                ", usuarioDioNoMeGusta=" + usuarioDioNoMeGusta +
+                '}';
     }
 }
