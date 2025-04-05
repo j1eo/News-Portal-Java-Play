@@ -43,7 +43,9 @@ PUT     /admin/noticia/:id               controllers.AdminController.actualizarN
 DELETE  /admin/noticia/:id               controllers.AdminController.eliminarNoticia(id: Long)
 
 # News & Articles
-GET     /noticias               controllers.NoticiasController.obtenerNoticias()
+GET     /noticias/milenio          controllers.NoticiasController.obtenerNoticiasMilenio()
+GET     /noticias/elpais           controllers.NoticiasController.obtenerNoticiasElPais()
+GET     /noticias/todas            controllers.NoticiasController.obtenerNoticias()
 GET     /articulos              controllers.ArticulosController.listarArticulos()
 POST    /articulos              controllers.ArticulosController.crearArticulo()
 GET     /articulo/:id           controllers.ArticulosController.mostrarArticulo(id: Integer)
@@ -64,3 +66,7 @@ DELETE  /noticias-propias/:id                   controllers.NoticiasPropiasContr
 # Assets
 GET     /assets/*file           controllers.Assets.versioned(path="/public", file: Asset)
 GET     /api/check-role      controllers.NoticiasPropiasController.verificarRol()
+
+
+# Search functionality
+GET     /search                  controllers.SearchController.search(q: String)

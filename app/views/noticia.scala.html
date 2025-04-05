@@ -37,11 +37,23 @@
                     <div class="article-header">
                         <h1>@noticia.getTitulo()</h1>
                         <div class="article-meta-info">
-                            <span class="author">Por @noticia.getAutor()</span>
-                            <span class="date">@noticia.getFechaPublicacion()</span>
-                            <span class="category">@noticia.getCategoria()</span>
+                            <span class="author">
+                                <i class="fas fa-user-edit"></i> 
+                                Por @noticia.getAutor()
+                            </span>
+                            <span class="date">
+                                <i class="far fa-calendar-alt"></i> 
+                                @noticia.getFechaPublicacion()
+                            </span>
+                            <span class="category">
+                                <i class="fas fa-tag"></i> 
+                                @noticia.getCategoria()
+                            </span>
                             @if(noticia.getFuente() != null && !noticia.getFuente().isEmpty()) {
-                                <span class="source">Fuente: @noticia.getFuente()</span>
+                                <span class="source">
+                                    <i class="fas fa-newspaper"></i> 
+                                    Fuente: @noticia.getFuente()
+                                </span>
                             }
                         </div>
                     </div>
@@ -118,7 +130,133 @@
     </div>
 
     <style>
-        /* Estilos similares a los de artículo, con algunas adaptaciones */
+        /* Estilos idénticos a los de artículo */
+        .user-dashboard-container {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .dashboard-content {
+            padding: 20px;
+        }
+        
+        /* Barra de usuario */
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #343a40;
+            color: white;
+            margin-bottom: 20px;
+        }
+        
+        .user-greeting {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logout-btn {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Contenedor principal */
+        .article-detail-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #eaeaea;
+        }
+        
+        /* Migas de pan */
+        .article-breadcrumb {
+            margin-bottom: 25px;
+            font-size: 0.9em;
+            color: #666;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .article-breadcrumb a {
+            color: #5E36B8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .article-breadcrumb a:hover {
+            color: #7a52d1;
+            text-decoration: underline;
+        }
+        
+        /* Encabezado */
+        .article-header h1 {
+            font-size: 2.1em;
+            margin-bottom: 15px;
+            color: #1E1E1E;
+            line-height: 1.3;
+        }
+        
+        .article-meta-info {
+            margin-bottom: 25px;
+            color: #666;
+            font-size: 0.95em;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .article-meta-info span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .article-meta-info i {
+            color: #5E36B8;
+            font-size: 0.9em;
+        }
+        
+        .source {
+            color: #666;
+            font-style: italic;
+        }
+        
+        /* Imagen principal */
+        .article-main-image {
+            margin-bottom: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .article-main-image img {
+            width: 100%;
+            max-height: 450px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        /* Cuerpo del contenido */
+        .article-body-content {
+            line-height: 1.8;
+            font-size: 1.1em;
+            margin-bottom: 35px;
+            color: #333;
+        }
+        
+        .article-body-content p {
+            margin-bottom: 1.5em;
+        }
+        
+        /* Enlace externo (específico para noticias) */
         .article-external-link {
             margin: 20px 0;
             text-align: center;
@@ -140,10 +278,137 @@
             background-color: #7a52d1;
         }
         
-        .source {
-            color: #666;
-            font-style: italic;
+        /* Acciones */
+        .article-actions-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 35px;
+            padding: 18px 0;
+            border-top: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+            flex-wrap: wrap;
         }
+        
+        .action-btn {
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            background-color: #5E36B8;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+        
+        .action-btn:hover {
+            background-color: #7a52d1;
+            transform: translateY(-2px);
+        }
+        
+        /* Noticias relacionadas */
+        .article-related-section {
+            margin: 45px 0 30px;
+        }
+        
+        .article-related-section h2 {
+            margin-bottom: 22px;
+            color: #1E1E1E;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .article-related-section h2 i {
+            color: #5E36B8;
+        }
+        
+        .article-related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+        
+        .article-related-item {
+            background: white;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        .article-related-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .article-related-item img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+        
+        .article-related-item h3 {
+            padding: 15px;
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .article-related-item .action-btn {
+            margin: 0 15px 15px;
+            display: inline-block;
+            width: calc(100% - 30px);
+            text-align: center;
+        }
+        
+        /* Comentarios */
+        .article-comments-section {
+            margin-top: 50px;
+        }
+        
+        .article-comments-section h2 {
+            margin-bottom: 22px;
+            color: #1E1E1E;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .article-comments-section h2 i {
+            color: #5E36B8;
+        }
+        
+        .article-comment-form textarea {
+            width: 100%;
+            min-height: 120px;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.95em;
+            resize: vertical;
+            transition: border 0.3s;
+        }
+        
+        .article-comment-form textarea:focus {
+            border-color: #5E36B8;
+            outline: none;
+        }
+        
+        .comments-list {
+            margin-top: 25px;
+            color: #555;
+            font-size: 0.95em;
+        }
+        
+     
     </style>
     
     <script>

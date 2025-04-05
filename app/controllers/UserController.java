@@ -22,8 +22,8 @@ public class UserController extends Controller {
     public Result dashboard() {
         Http.Cookie jwtCookie = request().cookie("jwt");
         if (jwtCookie == null) {
-            flash("error", "Debes iniciar sesión");
-            return redirect(routes.AuthController.login());
+            
+            return redirect(routes.HomeController.index());
         }
 
         try {
