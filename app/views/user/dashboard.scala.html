@@ -1,4 +1,8 @@
-@(usuario: models.Usuario, articulosPublicados: List[models.Articulo], message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
+@(usuario: models.Usuario, 
+articulosPublicados: List[models.Articulo],
+noticiaPrincipal: models.NoticiaPropia,
+  noticiasSecundarias: List[models.NoticiaPropia], 
+message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
 
 @userbanner("Panel de Usuario", message) {
 	<div id="overlay">
@@ -41,7 +45,7 @@
                             <i class="fas fa-newspaper"></i> Ver noticias
                         </a>
                         <a href="@routes.ArticulosController.listarArticulos()" class="action-btn">
-                            <i class="fas fa-book"></i> Artículos guardados
+                            <i class="fas fa-book"></i> Ver Artículos
                         </a>
                     </div>
                 </div>
@@ -49,33 +53,75 @@
                 <!-- Sección central de contenido -->
                 <div class="content-section">
                     <!-- Noticias Destacadas -->
-                    <section class="main-news">
-                        <img src="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Título de la noticia">
-                        <div class="main-news-text">
-                            <h1>Título de la Noticia Principal</h1>
-                            <p>Breve descripción de la noticia principal.</p>
-                            <a href="enlace-a-la-noticia" target="_blank">Leer más</a>
-                        </div>
-                    </section>
+					<section class="main-news">
+					                        @if(noticiaPrincipal != null) {
+					                            <img src="@noticiaPrincipal.getImagen()" alt="@noticiaPrincipal.getTitulo()" 
+					                                 onerror="this.src='@routes.Assets.versioned("images/imagenplaceholder.png")'">
+					                            <div class="main-news-text">
+					                                <h1>@noticiaPrincipal.getTitulo()</h1>
+					                                <p>@noticiaPrincipal.getDescripcion()</p>
+					                                <a href="@routes.NoticiasPropiasController.mostrarNoticia(noticiaPrincipal.getIdNoticia())" target="_blank">Leer más</a>
+					                            </div>
+					                        } else {
+					                            <!-- Contenido por defecto si no hay noticias -->
+					                            <img src="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Título de la noticia">
+					                            <div class="main-news-text">
+					                                <h1>Título de la Noticia Principal</h1>
+					                                <p>Breve descripción de la noticia principal.</p>
+					                                <a href="#" target="_blank">Leer más</a>
+					                            </div>
+					                        }
+					                    </section>
 
-                    <!-- Noticias Secundarias -->
-                    <section class="secondary-news">
-                        <div class="title-section">
-                            <h2>Noticias Secundarias</h2>
-                        </div>
-                        <div class="secondary-news-container">
-                            <div id="noticia-secundaria-1" class="secondary-news-item"></div>
-                            <div id="noticia-secundaria-2" class="secondary-news-item"></div>
-                        </div>
-                    </section>
+										<!-- Noticias Secundarias -->
+										                    <section class="secondary-news">
+										                        <div class="title-section">
+										                            <h2>Otras Noticias</h2>
+										                        </div>
+										                        <div class="secondary-news-container">
+										                            @if(!noticiasSecundarias.isEmpty()) {
+										                                @for((noticia, index) <- noticiasSecundarias.zipWithIndex) {
+										                                    <div id="noticia-secundaria-@(index+1)" class="secondary-news-item">
+										                                        <img src="@noticia.getImagen()" alt="@noticia.getTitulo()" 
+										                                             onerror="this.src='@routes.Assets.versioned("images/imagenplaceholder.png")'">
+										                                        <h2>@noticia.getTitulo()</h2>
+										                                        <p>@noticia.getDescripcion()</p>
+										                                        <a href="@routes.NoticiasPropiasController.mostrarNoticia(noticia.getIdNoticia())" target="_blank">Leer más</a>
+										                                    </div>
+										                                }
+										                            } else {
+										                                <!-- Contenido por defecto si no hay noticias secundarias -->
+										                                <div id="noticia-secundaria-1" class="secondary-news-item">
+										                                    <img src="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Noticia secundaria 1">
+										                                    <h2>Título Noticia Secundaria 1</h2>
+										                                    <p>Descripción breve de la noticia secundaria 1</p>
+										                                    <a href="#" target="_blank">Leer más</a>
+										                                </div>
+										                                <div id="noticia-secundaria-2" class="secondary-news-item">
+										                                    <img src="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Noticia secundaria 2">
+										                                    <h2>Título Noticia Secundaria 2</h2>
+										                                    <p>Descripción breve de la noticia secundaria 2</p>
+										                                    <a href="#" target="_blank">Leer más</a>
+										                                </div>
+										                            }
+										                        </div>
+										                    </section>
 
-                    <!-- Más Noticias -->
-                    <section class="more-news">
-                        <div class="title-section">
-                            <h2>Más Noticias</h2>
-                        </div>
-                        <div id="noticias-lista" class="news-grid"></div>
-                    </section>
+															<!-- Más Noticias -->
+															                    <section class="more-news">
+															                        <div class="title-section">
+															                            <h2>Noticias de MILENIO</h2>
+															                        </div>
+															                        <div id="noticias-lista-milenio" class="news-grid"></div>
+															                    </section>
+
+															                    <section class="more-news">
+															                        <div class="title-section">
+															                            <h2>Noticias de EL PAIS</h2>
+															                        </div>
+															                        <div id="noticias-lista-elpais" class="news-grid"></div>
+															                    </section>
+															            
                 </div>
 
                 <!-- Sidebar de artículos -->

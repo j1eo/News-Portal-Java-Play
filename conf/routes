@@ -68,11 +68,13 @@ POST    /noticias-propias                       controllers.NoticiasPropiasContr
 GET     /noticias-propias/:id                   controllers.NoticiasPropiasController.mostrarNoticia(id: Integer)
 DELETE  /noticias-propias/:id                   controllers.NoticiasPropiasController.eliminarNoticia(id: Integer)
 
+# Suscripciones
+GET     /user/suscripcion         controllers.UserController.mostrarFormularioSuscripcion()
+POST    /user/suscripcion         controllers.UserController.actualizarSuscripcion()
 
 # Assets
 GET     /assets/*file           controllers.Assets.versioned(path="/public", file: Asset)
 GET     /api/check-role      controllers.NoticiasPropiasController.verificarRol()
-
 
 # Search functionality
 GET     /search                  controllers.SearchController.search(q: String)

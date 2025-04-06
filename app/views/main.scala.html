@@ -23,18 +23,18 @@
                     </div>
                 </a> 
                 <div class="buttons">
-                    <a href="@routes.AuthController.login()" class="btn btn-primary">INICIAR SESIÓN</a>
-                    <button class="btn btn-secondary">SUSCRÍBETE</button>
+                    <button onclick="window.location.href='@routes.AuthController.login()'" class="btn btn-primary">INICIAR SESIÓN</button>
+                    <button onclick="window.location.href='@routes.AuthController.login()'" class="btn btn-secondary">SUSCRÍBETE</button>
                 </div>
             </div>
         </header>
-        <nav class="nav-bar">    
-            <button class="nav-button">NOTICIAS LOCALES</button>
-            <button class="nav-button">NOTICIAS NACIONALES</button>
-            <button class="nav-button" onclick="window.location.href='@routes.ArticulosController.listarArticulos()'">ARTÍCULOS</button>
-            <button class="nav-button" onclick="window.open('https://www.milenio.com', '_blank');">MILENIO</button>
-            <button class="nav-button" onclick="window.open('https://elpais.com/mexico/', '_blank');">EL PAÍS</button>
-        </nav>
+		<nav class="nav-bar">    
+				            <button class="nav-button" onclick="window.location.href='@routes.UserController.dashboard()'">TODAS LAS NOTICIAS </button>
+				            <button class="nav-button" onclick="window.location.href='@routes.NoticiasPropiasController.listarNoticias()'">NUESTRAS NOTICIAS</button>
+				            <button class="nav-button" onclick="window.location.href='@routes.ArticulosController.listarArticulos()'">ARTÍCULOS</button>
+				            <button class="nav-button" onclick="window.open('https://www.milenio.com', '_blank');">MILENIO</button>
+				            <button class="nav-button" onclick="window.open('https://elpais.com/mexico/', '_blank');">EL PAÍS</button>
+				        </nav>
         
         <!-- Sidenav con diseño mejorado -->
         <div id="mySidenav" class="sidenav">
@@ -106,5 +106,23 @@
                 }
             });
         </script>
+		<style>
+			.logo-link .logo img {
+			                transition: transform 0.3s ease; /* Suaviza la transición */
+			            }
+			            
+			            .logo-link:hover .logo img {
+			                transform: scale(1.1); /* Aumenta el tamaño en un 10% */
+			            }
+			            
+			            /* Opcional: efecto para el texto también */
+			            .logo-link .logo h1 {
+			                transition: transform 0.3s ease;
+			            }
+			            
+			            .logo-link:hover .logo h1 {
+			                transform: scale(1.05);
+			            }
+		</style>
     </body>
 </html>

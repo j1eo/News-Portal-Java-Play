@@ -326,6 +326,40 @@ public class AuthService {
             return false;
         }
     }
+    
+    public boolean actualizarSuscripcion(Usuario usuario) throws SQLException {
+        // Usamos transacción para asegurar la integridad de los datos
+        Connection conn = null;
+        try {
+            conn = dbConnection.getConnection();
+            conn.setAutoCommit(false);  // Iniciar transacción
+
+            // 1. Actualizar la suscripción en la tabla Usuario
+            String sqlUsuario = "UPDATE Usuario SET Suscripcion = ? WHERE ID_Usuario = ?";
+            try (PreparedStatement stmtUsuario = conn.prepareStatement(sqlUsuario)) {
+                stmtUsuario.setString(1, usuario.getSuscripcion());
+                stmtUsuario.setInt(2, usuario.getIdUsuario());
+                
+                int filasAfectadas = stmtUsuario.executeUpdate();
+                
+                if (filasAfectadas == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+
+            // Podrías añadir aquí lógica adicional si necesitas actualizar otros datos relacionados
+            
+            conn.commit();  // Confirmar la transacción
+            return true;
+            
+        } catch (SQLException e) {
+            if (conn != null) conn.rollback();
+            throw e;
+        } finally {
+            if (conn != null) conn.setAutoCommit(true);
+        }
+    }
 
     /**
      * Verifica si el email ya está registrado por otro usuario.

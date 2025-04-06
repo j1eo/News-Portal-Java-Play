@@ -35,16 +35,18 @@
                            INICIAR SESION
                         </button>
                     }
-                    <button class="btn btn-secondary" type="button">
-                        SUSCRÍBETE
-                    </button>
+					<button onclick="window.location.href='@routes.UserController.mostrarFormularioSuscripcion()'" 
+					        class="btn btn-secondary" 
+					        type="button">
+					    SUSCRÍBETE
+					</button>
                 </div>
             </div>
         </header>
 
 		<nav class="nav-bar">    
-		            <button class="nav-button">NOTICIAS LOCALES</button>
-		            <button class="nav-button">NOTICIAS NACIONALES</button>
+		            <button class="nav-button" onclick="window.location.href='@routes.UserController.dashboard()'">TODAS LAS NOTICIAS </button>
+		            <button class="nav-button" onclick="window.location.href='@routes.NoticiasPropiasController.listarNoticias()'">NUESTRAS NOTICIAS</button>
 		            <button class="nav-button" onclick="window.location.href='@routes.ArticulosController.listarArticulos()'">ARTÍCULOS</button>
 		            <button class="nav-button" onclick="window.open('https://www.milenio.com', '_blank');">MILENIO</button>
 		            <button class="nav-button" onclick="window.open('https://elpais.com/mexico/', '_blank');">EL PAÍS</button>
@@ -71,10 +73,11 @@
 		            </div>
 		            
 		            <div class="sidenav-links">
-		                <a href="#"><i class="fas fa-map-marker-alt"></i> Noticias Locales</a>
-		                <a href="#"><i class="fas fa-globe-americas"></i> Noticias Nacionales</a>
+		                <a href="#"><i class="fas fa-globe-americas"></i> Todas las Noticias</a>
+		                <a href="#"><i class="fas fa-calendar"></i> Nuestras Noticias</a>
 		                <a href="@routes.ArticulosController.listarArticulos()"><i class="fas fa-file-alt"></i> Artículos</a>
-		                <a href="#"><i class="fas fa-question-circle"></i> Preguntas Frecuentes</a>
+		                <a href="#"><i class="fas fa-newspaper"></i> Milenio</a>
+						<a href="#"><i class="fas fa-newspaper"></i> El Pais</a>
 		            </div>
 		        </div>
 		        
@@ -120,6 +123,24 @@
 		                }
 		            });
 		        </script>
+				<style>
+							.logo-link .logo img {
+							                transition: transform 0.3s ease; /* Suaviza la transición */
+							            }
+							            
+							            .logo-link:hover .logo img {
+							                transform: scale(1.1); /* Aumenta el tamaño en un 10% */
+							            }
+							            
+							            /* Opcional: efecto para el texto también */
+							            .logo-link .logo h1 {
+							                transition: transform 0.3s ease;
+							            }
+							            
+							            .logo-link:hover .logo h1 {
+							                transform: scale(1.05);
+							            }
+						</style>
         
     </body>
 </html>
