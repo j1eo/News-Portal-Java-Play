@@ -5,225 +5,294 @@
   message: String,
   request: play.mvc.Http.Request)
 
-@main(title, message) {
-    <div class="search-results-container">
-        <h1 class="title-section">@title</h1>
-        
-        @if(articulos.isEmpty() && noticias.isEmpty()) {
-            <div class="no-results-message">
-                <i class="fas fa-search"></i>
-                <p>No se encontraron resultados para tu búsqueda.</p>
+@user.userbanner(title, message) {
+    <div class="user-dashboard-container">
+        <!-- Barra superior con información de usuario -->
+        @if(usuario != null && usuario.getNombre() != null) {
+            <div class="user-header">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Bienvenido, <strong>@usuario.getNombre()</strong></span>
+                </div>
+                <a href="@routes.AuthController.logout()" class="logout-btn" onclick="return confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </a>
             </div>
         } else {
-            @if(!articulos.isEmpty()) {
-                <section class="results-section">
-                    <h2 class="section-title"><i class="fas fa-file-alt"></i> Artículos encontrados</h2>
-                    <div class="content-grid">
-                        @for(articulo <- articulos) {
-                            <div class="content-card">
-                                @if(articulo.getImagen() != null && !articulo.getImagen().isEmpty()) {
-                                    <div class="content-image">
-                                        <img src="@articulo.getImagen()" alt="@articulo.getTitulo()">
-                                    </div>
-                                }
-                                <div class="content-body">
-                                    <h3>@articulo.getTitulo()</h3>
-                                    <div class="content-meta">
-                                        <span class="author">@articulo.getAutor()</span>
-                                        <span class="date">@articulo.getFechaPublicacion()</span>
-                                        <span class="category">@articulo.getCategoria()</span>
-                                    </div>
-                                    <div class="content-excerpt">
-                                        @if(articulo.getContenido().length() > 150) {
-                                            @articulo.getContenido().substring(0, 150)...
-                                        } else {
-                                            @articulo.getContenido()
-                                        }
-                                    </div>
-                                    <a href="@routes.ArticulosController.mostrarArticulo(articulo.getIdArticulo())" class="read-more-btn">
-                                        <i class="fas fa-book-reader"></i> Leer más
-                                    </a>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </section>
-            }
-
-            @if(!noticias.isEmpty()) {
-                <section class="results-section">
-                    <h2 class="section-title"><i class="fas fa-newspaper"></i> Noticias encontradas</h2>
-                    <div class="content-grid">
-                        @for(noticia <- noticias) {
-                            <div class="content-card">
-                                @if(noticia.getImagen() != null && !noticia.getImagen().isEmpty()) {
-                                    <div class="content-image">
-                                        <img src="@noticia.getImagen()" alt="@noticia.getTitulo()">
-                                    </div>
-                                }
-                                <div class="content-body">
-                                    <h3>@noticia.getTitulo()</h3>
-                                    <div class="content-meta">
-                                        <span class="source">@noticia.getFuente()</span>
-                                        <span class="date">@noticia.getFechaPublicacion()</span>
-                                        <span class="category">@noticia.getCategoria()</span>
-                                    </div>
-                                    <div class="content-excerpt">
-                                        @noticia.getDescripcion()
-                                    </div>
-                                    <a href="@routes.NoticiasPropiasController.mostrarNoticia(noticia.getIdNoticia())" class="read-more-btn">
-                                        <i class="fas fa-book-reader"></i> Leer más
-                                    </a>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </section>
-            }
+            <div class="user-header">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Bienvenido, <strong>Invitado</strong></span>
+                </div>
+            </div>
         }
+
+        <!-- Contenido principal del dashboard -->
+        <div class="dashboard-content">
+            <div class="news-list-container">
+                <!-- Ruta de navegación -->
+                <div class="news-breadcrumb">
+                    <a href="@routes.UserController.dashboard()">Dashboard</a> > 
+                    <span>@title</span>
+                </div>
+
+                <!-- Título de la sección -->
+                <div class="news-list-header">
+                    <h1><i class="fas fa-search"></i> @title</h1>
+                    @if(title.equals("Lista de Artículos") && usuario != null) {
+                        <a href="@routes.ArticulosController.mostrarFormularioCreacion()" class="action-btn">
+                            <i class="fas fa-plus"></i> Crear Artículo
+                        </a>
+                    }
+                </div>
+
+                @if(articulos.isEmpty() && noticias.isEmpty()) {
+                    <div class="no-results-message">
+                        <i class="fas fa-search"></i>
+                        <p>No se encontraron resultados para tu búsqueda.</p>
+                    </div>
+                } else {
+                    @if(!articulos.isEmpty()) {
+                        <section class="results-section">
+                            <h2 class="section-title"><i class="fas fa-file-alt"></i> Artículos encontrados</h2>
+                            <div class="news-grid">
+                                @for(articulo <- articulos) {
+                                    <div class="news-item">
+                                        @if(articulo.getImagen() != null && !articulo.getImagen().isEmpty()) {
+                                            <div class="news-image">
+                                                <img src="@articulo.getImagen()" alt="@articulo.getTitulo()">
+                                            </div>
+                                        }
+                                        <div class="news-content">
+                                            <h2>@articulo.getTitulo()</h2>
+                                            <div class="news-meta">
+                                                <span class="author">@articulo.getAutor()</span>
+                                                <span class="date">@articulo.getFechaPublicacion()</span>
+                                                <span class="category">@articulo.getCategoria()</span>
+                                            </div>
+                                            @if(articulo.getContenido() != null && !articulo.getContenido().isEmpty()) {
+                                                <p class="news-description">
+                                                    @if(articulo.getContenido().length() > 150) {
+                                                        @articulo.getContenido().substring(0, 150)...
+                                                    } else {
+                                                        @articulo.getContenido()
+                                                    }
+                                                </p>
+                                            }
+                                            <a href="@routes.ArticulosController.mostrarArticulo(articulo.getIdArticulo())" class="read-more-btn">
+                                                <i class="fas fa-book-reader"></i> Leer más
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </section>
+                    }
+
+                    @if(!noticias.isEmpty()) {
+                        <section class="results-section">
+                            <h2 class="section-title"><i class="fas fa-newspaper"></i> Noticias encontradas</h2>
+                            <div class="news-grid">
+                                @for(noticia <- noticias) {
+                                    <div class="news-item">
+                                        @if(noticia.getImagen() != null && !noticia.getImagen().isEmpty()) {
+                                            <div class="news-image">
+                                                <img src="@noticia.getImagen()" alt="@noticia.getTitulo()">
+                                            </div>
+                                        }
+                                        <div class="news-content">
+                                            <h2>@noticia.getTitulo()</h2>
+                                            <div class="news-meta">
+                                                <span class="author">@noticia.getFuente()</span>
+                                                <span class="date">@noticia.getFechaPublicacion()</span>
+                                                <span class="category">@noticia.getCategoria()</span>
+                                            </div>
+                                            @if(noticia.getDescripcion() != null && !noticia.getDescripcion().isEmpty()) {
+                                                <p class="news-description">
+                                                    @noticia.getDescripcion()
+                                                </p>
+                                            }
+                                            <a href="@routes.NoticiasPropiasController.mostrarNoticia(noticia.getIdNoticia())" class="read-more-btn">
+                                                <i class="fas fa-book-reader"></i> Leer más
+                                            </a>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </section>
+                    }
+                }
+            </div>
+        </div>
     </div>
 
-<style>
-    /* Estilos base */
-    .search-results-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem 1rem;
-    }
+    <style>
+       
+        /* Estilos de la lista de noticias/artículos */
+        .news-list-container {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #eaeaea;
+            padding: 30px;
+        }
 
-    .title-section {
-        font-size: 2rem;
-        text-align: center;
-        margin-bottom: 2rem;
-        color: #343a40;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-    }
+        .news-breadcrumb {
+            margin-bottom: 25px;
+            font-size: 0.9em;
+            color: #666;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
 
-    .no-results-message {
-        text-align: center;
-        padding: 3rem;
-        color: #6c757d;
-    }
+        .news-breadcrumb a {
+            color: #5E36B8;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
 
-    .no-results-message i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        color: #adb5bd;
-    }
+        .news-breadcrumb a:hover {
+            color: #7a52d1;
+            text-decoration: underline;
+        }
 
-    .no-results-message p {
-        font-size: 1.2rem;
-    }
+        .news-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
 
-    /* Secciones de resultados */
-    .results-section {
-        margin-bottom: 3rem;
-    }
+        .news-list-header h1 {
+            font-size: 1.8em;
+            color: #1E1E1E;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
 
-    .section-title {
-        font-size: 1.5rem;
-        margin-bottom: 1.5rem;
-        color: #495057;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+        .news-list-header h1 i {
+            color: #5E36B8;
+        }
 
-    .section-title i {
-        color: #5E36B8;
-    }
+        .results-section {
+            margin-bottom: 40px;
+        }
 
-    /* Grid de contenido */
-    .content-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 25px;
-    }
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-    /* Tarjetas de contenido */
-    .content-card {
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
+        .section-title i {
+            color: #5E36B8;
+        }
 
-    .content-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-    }
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
 
-    .content-image {
-        height: 200px;
-        overflow: hidden;
-    }
+        .news-item {
+            background: white;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
 
-    .content-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.3s;
-    }
+        .news-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
 
-    .content-card:hover .content-image img {
-        transform: scale(1.05);
-    }
+        .news-image {
+            height: 200px;
+            overflow: hidden;
+        }
 
-    .content-body {
-        padding: 20px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-    }
+        .news-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
 
-    .content-body h3 {
-        font-size: 1.3em;
-        margin-bottom: 10px;
-        color: #2c3e50;
-    }
+        .news-item:hover .news-image img {
+            transform: scale(1.05);
+        }
 
-    .content-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 15px;
-        color: #666;
-        font-size: 0.85em;
-    }
+        .news-content {
+            padding: 20px;
+        }
 
-    .content-excerpt {
-        color: #555;
-        line-height: 1.6;
-        margin-bottom: 15px;
-        flex-grow: 1;
-    }
+        .news-content h2 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
 
-    .read-more-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 15px;
-        background-color: #5E36B8;
-        color: white;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 0.9em;
-        transition: background-color 0.3s;
-        align-self: flex-start;
-    }
+        .news-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 0.85em;
+        }
 
-    .read-more-btn:hover {
-        background-color: #7a52d1;
-        color: white;
-    }
+        .news-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
 
-  
-</style>
+        .read-more-btn, .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 15px;
+            background-color: #5E36B8;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+        }
+
+        .read-more-btn:hover, .action-btn:hover {
+            background-color: #7a52d1;
+            color: white;
+        }
+
+        .no-results-message {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .no-results-message i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #adb5bd;
+        }
+
+        .no-results-message p {
+            font-size: 1.2rem;
+        }
+    </style>
+    
+    <script>
+        function confirmLogout() {
+            return confirm("¿Estás seguro que deseas cerrar sesión?");
+        }
+    </script>
 }

@@ -36,7 +36,8 @@ public class SearchService {
                       "LEFT JOIN Etiqueta e ON ae.ID_Etiqueta = e.ID_Etiqueta " +
                       "WHERE (LOWER(a.Titulo) LIKE ? OR " +
                       "LOWER(a.Contenido) LIKE ? OR " +
-                      "LOWER(e.Nombre) LIKE ?) AND " +
+                      "LOWER(e.Nombre) LIKE ? OR " +
+                      "LOWER(c.Nombre) LIKE ?) AND " +
                       "a.Estado = 'PUBLICADO' " +
                       "ORDER BY a.Fecha_Publicacion DESC";
 
@@ -46,6 +47,7 @@ public class SearchService {
             stmt.setString(1, searchPattern);
             stmt.setString(2, searchPattern);
             stmt.setString(3, searchPattern);
+            stmt.setString(4, searchPattern);
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -76,7 +78,8 @@ public class SearchService {
                       "WHERE (LOWER(n.Titulo) LIKE ? OR " +
                       "LOWER(n.Contenido) LIKE ? OR " +
                       "LOWER(n.Descripcion) LIKE ? OR " +
-                      "LOWER(e.Nombre) LIKE ?) AND " +
+                      "LOWER(e.Nombre) LIKE ? OR " +
+                      "LOWER(c.Nombre) LIKE ?) AND " +
                       "n.Estado = 'PUBLICADO' " +
                       "ORDER BY n.Fecha_Publicacion DESC";
 
@@ -87,6 +90,7 @@ public class SearchService {
             stmt.setString(2, searchPattern);
             stmt.setString(3, searchPattern);
             stmt.setString(4, searchPattern);
+            stmt.setString(5, searchPattern);
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
