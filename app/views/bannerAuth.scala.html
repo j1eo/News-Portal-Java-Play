@@ -26,5 +26,23 @@
         <!-- Contenido dinámico de la página -->
         @content
     </body>
+	<style>
+								.logo-link .logo img {
+								                transition: transform 0.3s ease; /* Suaviza la transición */
+								            }
+								            
+								            .logo-link:hover .logo img {
+								                transform: scale(1.1); /* Aumenta el tamaño en un 10% */
+								            }
+								            
+								            /* Opcional: efecto para el texto también */
+								            .logo-link .logo h1 {
+								                transition: transform 0.3s ease;
+								            }
+								            
+								            .logo-link:hover .logo h1 {
+								                transform: scale(1.05);
+								            }
+							</style>
 	
 </html>

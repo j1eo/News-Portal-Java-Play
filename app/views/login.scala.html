@@ -35,15 +35,17 @@
 	                    <button type="submit" class="login-btn">INGRESAR</button>
 	                    
 	                    <div class="login-links">
-	                        <a href="#">¿Olvidaste tu contraseña?</a>
-	                        <a href="@routes.AuthController.register()">¿Eres Staff?, ingresa aquí</a>
+	                        
 	                        <a href="@routes.AuthController.register()">Si no tienes usuario, regístrate</a>
 	                    </div>
-	                </form>
 	                
 	                <div class="register-btn-container">
-	                    <a href="@routes.AuthController.register()" class="register-btn">Regístrate</a>
+						<button onclick="window.location.href='@routes.AuthController.register().absoluteURL(request)'; return false;" 
+						           class="register-btn">
+						       Regístrate
+						   </button>
 	                </div>
+	                </form>
 	            </div>
 	        </div>
 	    </main>
