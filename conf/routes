@@ -61,12 +61,20 @@ GET     /comentarios/:idArticulo      controllers.ComentariosController.obtenerC
 POST    /articulo/:id/comentario      controllers.ComentariosController.agregarComentario(id: Integer)
 DELETE  /comentario/:id               controllers.ComentariosController.eliminarComentario(id: Integer)
 
+# Comentarios para noticias
+GET     /comentarios-noticia/:id          controllers.ComentariosController.obtenerComentariosNoticia(id: Integer)
+POST    /noticias-propias/:id/comentario  controllers.ComentariosController.agregarComentarioNoticia(id: Integer)
+DELETE  /comentario-noticia/:id           controllers.ComentariosController.eliminarComentarioNoticia(id: Integer)
+
 # Noticias Propias
 GET     /noticias-propias/crear                 controllers.NoticiasPropiasController.mostrarFormularioCreacion()
 GET     /noticias-propias                       controllers.NoticiasPropiasController.listarNoticias()
 POST    /noticias-propias                       controllers.NoticiasPropiasController.crearNoticia()
 GET     /noticias-propias/:id                   controllers.NoticiasPropiasController.mostrarNoticia(id: Integer)
 DELETE  /noticias-propias/:id                   controllers.NoticiasPropiasController.eliminarNoticia(id: Integer)
+
+POST    /noticias-propias/:id/like              controllers.NoticiasPropiasController.darLikeNoticiaPropia(id: Int)
+POST    /noticias-propias/:id/dislike           controllers.NoticiasPropiasController.darNoMeGustaNoticiaPropia(id: Int)
 
 # Suscripciones
 GET     /user/suscripcion         controllers.UserController.mostrarFormularioSuscripcion()

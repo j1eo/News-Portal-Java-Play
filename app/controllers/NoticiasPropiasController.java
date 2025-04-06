@@ -206,4 +206,123 @@ public class NoticiasPropiasController extends Controller {
         }
     }
     
+    @Security.Authenticated(Secured.class)
+    public Result darLikeNoticiaPropia(int idNoticia) {
+        try {
+            Usuario usuario = obtenerUsuarioCompleto();
+            if (usuario == null) {
+                Logger.error("Intento de like sin usuario autenticado");
+                return unauthorized(Json.newObject()
+                    .put("success", false)
+                    .put("message", "Debes iniciar sesión para esta acción"));
+            }
+
+            Logger.debug("Intentando registrar like - Noticia: {}, Usuario: {}", idNoticia, usuario.getIdUsuario());
+            
+            // Verificar si es el autor de la noticia
+            NoticiaPropia noticia = noticiasService.obtenerNoticiaPorId(idNoticia);
+            if (noticia != null && noticia.getIdUsuario() == usuario.getIdUsuario()) {
+                return badRequest(Json.newObject()
+                    .put("success", false)
+                    .put("message", "No puedes dar like a tu propia noticia"));
+            }
+
+            boolean exito = noticiasService.darLikeNoticia(idNoticia, usuario.getIdUsuario());
+            
+            if (exito) {
+                NoticiaPropia noticiaActualizada = noticiasService.obtenerNoticiaPorIdConLikes(idNoticia, usuario.getIdUsuario());
+                return ok(Json.newObject()
+                    .put("success", true)
+                    .put("message", "Like registrado")
+                    .put("nuevoTotalLikes", noticiaActualizada.getMeGusta())
+                    .put("nuevoTotalDislikes", noticiaActualizada.getNoMeGusta())
+                    .put("usuarioDioLike", noticiaActualizada.isUsuarioDioLike())
+                    .put("usuarioDioNoMeGusta", noticiaActualizada.isUsuarioDioNoMeGusta()));
+            } else {
+                // Verificar si ya existe un like
+                boolean yaDioLike = noticiasService.obtenerNoticiaPorIdConLikes(idNoticia, usuario.getIdUsuario())
+                    .isUsuarioDioLike();
+                    
+                if (yaDioLike) {
+                    return badRequest(Json.newObject()
+                        .put("success", false)
+                        .put("message", "Ya has dado like a esta noticia"));
+                }
+                
+                return badRequest(Json.newObject()
+                    .put("success", false)
+                    .put("message", "No se pudo registrar el like"));
+            }
+        } catch (SQLException e) {
+            Logger.error("Error de base de datos al registrar like", e);
+            return internalServerError(Json.newObject()
+                .put("success", false)
+                .put("message", "Error en la base de datos"));
+        } catch (Exception e) {
+            Logger.error("Error inesperado al registrar like", e);
+            return internalServerError(Json.newObject()
+                .put("success", false)
+                .put("message", "Error interno del servidor"));
+        }
+    }
+    @Security.Authenticated(Secured.class)
+    public Result darNoMeGustaNoticiaPropia(int idNoticia) {
+        try {
+            Usuario usuario = obtenerUsuarioCompleto();
+            if (usuario == null) {
+                Logger.error("Intento de dislike sin usuario autenticado");
+                return unauthorized(Json.newObject()
+                    .put("success", false)
+                    .put("message", "Debes iniciar sesión para esta acción"));
+            }
+
+            Logger.debug("Intentando registrar dislike - Noticia: {}, Usuario: {}", idNoticia, usuario.getIdUsuario());
+            
+            // Verificar si es el autor de la noticia
+            NoticiaPropia noticia = noticiasService.obtenerNoticiaPorId(idNoticia);
+            if (noticia != null && noticia.getIdUsuario() == usuario.getIdUsuario()) {
+                return badRequest(Json.newObject()
+                    .put("success", false)
+                    .put("message", "No puedes dar dislike a tu propia noticia"));
+            }
+
+            boolean exito = noticiasService.darNoMeGustaNoticia(idNoticia, usuario.getIdUsuario());
+            
+            if (exito) {
+                NoticiaPropia noticiaActualizada = noticiasService.obtenerNoticiaPorIdConLikes(idNoticia, usuario.getIdUsuario());
+                return ok(Json.newObject()
+                    .put("success", true)
+                    .put("message", "Dislike registrado")
+                    .put("nuevoTotalLikes", noticiaActualizada.getMeGusta())
+                    .put("nuevoTotalDislikes", noticiaActualizada.getNoMeGusta())
+                    .put("usuarioDioLike", noticiaActualizada.isUsuarioDioLike())
+                    .put("usuarioDioNoMeGusta", noticiaActualizada.isUsuarioDioNoMeGusta()));
+            } else {
+                // Verificar si ya existe un dislike
+                boolean yaDioDislike = noticiasService.obtenerNoticiaPorIdConLikes(idNoticia, usuario.getIdUsuario())
+                    .isUsuarioDioNoMeGusta();
+                    
+                if (yaDioDislike) {
+                    return badRequest(Json.newObject()
+                        .put("success", false)
+                        .put("message", "Ya has dado dislike a esta noticia"));
+                }
+                
+                return badRequest(Json.newObject()
+                    .put("success", false)
+                    .put("message", "No se pudo registrar el dislike"));
+            }
+        } catch (SQLException e) {
+            Logger.error("Error de base de datos al registrar dislike", e);
+            return internalServerError(Json.newObject()
+                .put("success", false)
+                .put("message", "Error en la base de datos"));
+        } catch (Exception e) {
+            Logger.error("Error inesperado al registrar dislike", e);
+            return internalServerError(Json.newObject()
+                .put("success", false)
+                .put("message", "Error interno del servidor"));
+        }
+    }
+    
 }

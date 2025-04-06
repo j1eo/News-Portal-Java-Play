@@ -71,12 +71,7 @@
                                 <i class="fas fa-thumbs-down"></i> No me gusta (@articulo.getNoMeGusta())
                             </button>
                         }
-                        <button class="action-btn">
-                            <i class="fas fa-share-alt"></i> Compartir
-                        </button>
-                        <button class="action-btn">
-                            <i class="fas fa-bookmark"></i> Guardar
-                        </button>
+                        
                     </div>
                 </article>
 
@@ -129,303 +124,7 @@
             </div>
         </div>
 
-        <style>
-            /* Contenedor principal del artículo - Versión ajustada */
-            .article-detail-container {
-                max-width: 900px;
-                margin: 20px auto;
-                padding: 30px;
-                background: white;
-                border-radius: 10px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-                border: 1px solid #eaeaea;
-            }
-
-            /* Migas de pan mejoradas */
-            .article-breadcrumb {
-                margin-bottom: 25px;
-                font-size: 0.9em;
-                color: #666;
-                padding-bottom: 12px;
-                border-bottom: 1px solid #f0f0f0;
-            }
-
-            .article-breadcrumb a {
-                color: #5E36B8;
-                text-decoration: none;
-                transition: color 0.2s;
-            }
-
-            .article-breadcrumb a:hover {
-                color: #7a52d1;
-                text-decoration: underline;
-            }
-
-            /* Encabezado del artículo */
-            .article-header h1 {
-                font-size: 2.1em;
-                margin-bottom: 15px;
-                color: #1E1E1E;
-                line-height: 1.3;
-            }
-
-            .article-meta-info {
-                margin-bottom: 25px;
-                color: #666;
-                font-size: 0.95em;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 15px;
-            }
-
-            .article-meta-info span {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-            }
-
-            /* Imagen principal */
-            .article-main-image {
-                margin-bottom: 30px;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            }
-
-            .article-main-image img {
-                width: 100%;
-                max-height: 450px;
-                object-fit: cover;
-                display: block;
-            }
-
-            /* Cuerpo del artículo */
-            .article-body-content {
-                line-height: 1.8;
-                font-size: 1.1em;
-                margin-bottom: 35px;
-                color: #333;
-            }
-
-            .article-body-content p {
-                margin-bottom: 1.5em;
-            }
-
-            /* Acciones del artículo */
-            .article-actions-container {
-                display: flex;
-                gap: 12px;
-                margin-bottom: 35px;
-                padding: 18px 0;
-                border-top: 1px solid #f0f0f0;
-                border-bottom: 1px solid #f0f0f0;
-                flex-wrap: wrap;
-            }
-
-            .action-btn {
-                padding: 8px 15px;
-                background: #f8f9fa;
-                border: 1px solid #e0e0e0;
-                border-radius: 6px;
-                color: #5E36B8;
-                font-size: 0.9em;
-                cursor: pointer;
-                transition: all 0.2s;
-                display: flex;
-                align-items: center;
-                gap: 6px;
-            }
-
-            .action-btn:hover {
-                background: #e9ecef;
-                border-color: #d0d0d0;
-            }
-
-            .action-btn.active-like {
-                background: #e3f2fd;
-                border-color: #bbdefb;
-                color: #1976d2;
-            }
-
-            .action-btn.active-dislike {
-                background: #ffebee;
-                border-color: #ffcdd2;
-                color: #d32f2f;
-            }
-
-            .action-btn:disabled {
-                opacity: 0.7;
-                cursor: not-allowed;
-            }
-
-            /* Artículos relacionados */
-            .article-related-section {
-                margin: 45px 0 30px;
-            }
-
-            .article-related-section h2 {
-                margin-bottom: 22px;
-                color: #1E1E1E;
-                font-size: 1.4em;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .article-related-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-                gap: 20px;
-            }
-
-            .article-related-item {
-                background: white;
-                border: 1px solid #eaeaea;
-                border-radius: 8px;
-                overflow: hidden;
-                transition: all 0.3s ease;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            }
-
-            .article-related-item:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            }
-
-            .article-related-item img {
-                width: 100%;
-                height: 160px;
-                object-fit: cover;
-            }
-
-            .article-related-item h3 {
-                padding: 15px;
-                font-size: 1.1em;
-                color: #2c3e50;
-                margin: 0;
-            }
-
-            /* Sección de comentarios */
-            .article-comments-section {
-                margin-top: 50px;
-            }
-
-            .article-comments-section h2 {
-                margin-bottom: 22px;
-                color: #1E1E1E;
-                font-size: 1.4em;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .article-comment-form textarea {
-                width: 100%;
-                min-height: 120px;
-                margin-bottom: 10px;
-                padding: 15px;
-                border: 1px solid #ddd;
-                border-radius: 6px;
-                font-family: 'Inter', sans-serif;
-                font-size: 0.95em;
-                resize: vertical;
-                transition: border 0.3s;
-            }
-
-            .article-comment-form textarea:focus {
-                border-color: #5E36B8;
-                outline: none;
-            }
-
-            /* Estilos para la sección de comentarios */
-            .comments-list {
-                margin-top: 25px;
-            }
-
-            .loading-comments, .error-loading {
-                padding: 15px;
-                text-align: center;
-                color: #666;
-                background: #f9f9f9;
-                border-radius: 5px;
-                margin-bottom: 20px;
-            }
-
-            .error-loading {
-                color: #d32f2f;
-                background: #ffebee;
-            }
-
-            .comment-item {
-                padding: 15px;
-                margin-bottom: 15px;
-                background: #fff;
-                border-radius: 5px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-                border: 1px solid #eee;
-            }
-
-            .comment-header {
-                display: flex;
-                align-items: center;
-                margin-bottom: 10px;
-            }
-
-            .comment-avatar {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                margin-right: 10px;
-                object-fit: cover;
-            }
-
-            .comment-meta {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .comment-author {
-                font-weight: bold;
-                color: #333;
-            }
-
-            .comment-date {
-                font-size: 0.8em;
-                color: #888;
-            }
-
-            .comment-content {
-                margin: 10px 0;
-                line-height: 1.5;
-                color: #333;
-            }
-
-            .comment-actions {
-                text-align: right;
-            }
-
-            .comment-action-btn {
-                background: none;
-                border: none;
-                color: #d32f2f;
-                cursor: pointer;
-                font-size: 0.9em;
-                padding: 5px 10px;
-                border-radius: 3px;
-            }
-
-            .comment-action-btn:hover {
-                background: #ffebee;
-            }
-
-            .no-comments {
-                text-align: center;
-                color: #666;
-                font-style: italic;
-                padding: 20px;
-            }
-        </style>
-
+       
         <script>
             // Función para obtener el token CSRF
             function getCSRFToken() {
@@ -437,129 +136,113 @@
                 return confirm("¿Estás seguro que deseas cerrar sesión?");
             }
 
-            function darLike(articuloId, button) {
-                const originalHtml = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
-                button.disabled = true;
-                
-                fetch(`/articulo/${articuloId}/like`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': getCSRFToken()
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { 
-                            err.status = response.status;
-                            throw err;
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        const likeCount = document.getElementById(`like-count-${articuloId}`);
-                        likeCount.textContent = data.nuevoTotal || (parseInt(likeCount.textContent) + 1);
-                        
-                        button.classList.add('active-like');
-                        
-                        const dislikeBtn = document.querySelector(`button[onclick*="darNoMeGusta(${articuloId}"]`);
-                        if (dislikeBtn && dislikeBtn.classList.contains('active-dislike')) {
-                            const dislikeCount = document.getElementById(`dislike-count-${articuloId}`);
-                            dislikeCount.textContent = parseInt(dislikeCount.textContent) - 1;
-                            dislikeBtn.classList.remove('active-dislike');
-                        }
-                        
-                        showNotification(data.message || '¡Like registrado!', 'success');
-                    } else {
-                        showNotification(data.message || 'No se pudo registrar el like', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    let errorMsg = error.message || 'Error en la operación';
-                    
-                    if (error.status === 401) {
-                        errorMsg = 'Debes iniciar sesión para esta acción';
-                    } else if (error.status === 400) {
-                        errorMsg = error.message || 'No se pudo completar la acción';
-                    } else if (error.status === 500) {
-                        errorMsg = 'Error interno del servidor';
-                    }
-                    
-                    showNotification(errorMsg, 'error');
-                })
-                .finally(() => {
-                    button.innerHTML = originalHtml.replace('Procesando...', '');
-                    button.disabled = false;
-                });
-            }
+			function darLike(articuloId, button) {
+			    const originalHtml = button.innerHTML;
+			    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+			    button.disabled = true;
+			    
+			    fetch(`/articulo/${articuloId}/like`, {
+			        method: 'POST',
+			        headers: {
+			            'Content-Type': 'application/json',
+			            'X-Requested-With': 'XMLHttpRequest',
+			            'X-CSRF-TOKEN': getCSRFToken()
+			        },
+			        credentials: 'same-origin'
+			    })
+			    .then(response => {
+			        if (!response.ok) {
+			            return response.json().then(err => { 
+			                err.status = response.status;
+			                throw err;
+			            });
+			        }
+			        return response.json();
+			    })
+			    .then(data => {
+			        if (data.success) {
+			            showNotification(data.message || '¡Like registrado!', 'success');
+			            // Recargar la página después de 1 segundo
+			            setTimeout(() => {
+			                window.location.reload();
+			            }, 1000);
+			        } else {
+			            showNotification(data.message || 'No se pudo registrar el like', 'error');
+			        }
+			    })
+			    .catch(error => {
+			        console.error('Error:', error);
+			        let errorMsg = error.message || 'Error en la operación';
+			        
+			        if (error.status === 401) {
+			            errorMsg = 'Debes iniciar sesión para esta acción';
+			        } else if (error.status === 400) {
+			            errorMsg = error.message || 'No se pudo completar la acción';
+			        } else if (error.status === 500) {
+			            errorMsg = 'Error interno del servidor';
+			        }
+			        
+			        showNotification(errorMsg, 'error');
+			    })
+			    .finally(() => {
+			        button.innerHTML = originalHtml.replace('Procesando...', '');
+			        button.disabled = false;
+			    });
+			}
 
-            function darNoMeGusta(articuloId, button) {
-                const originalHtml = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
-                button.disabled = true;
-                
-                fetch(`/articulo/${articuloId}/no-me-gusta`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': getCSRFToken()
-                    },
-                    credentials: 'same-origin'
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { 
-                            err.status = response.status;
-                            throw err;
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        const dislikeCount = document.getElementById(`dislike-count-${articuloId}`);
-                        dislikeCount.textContent = data.nuevoTotal || (parseInt(dislikeCount.textContent) + 1);
-                        
-                        button.classList.add('active-dislike');
-                        
-                        const likeBtn = document.querySelector(`button[onclick*="darLike(${articuloId}"]`);
-                        if (likeBtn && likeBtn.classList.contains('active-like')) {
-                            const likeCount = document.getElementById(`like-count-${articuloId}`);
-                            likeCount.textContent = parseInt(likeCount.textContent) - 1;
-                            likeBtn.classList.remove('active-like');
-                        }
-                        
-                        showNotification(data.message || 'No me gusta registrado', 'success');
-                    } else {
-                        showNotification(data.message || 'No se pudo registrar el no me gusta', 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    let errorMsg = error.message || 'Error en la operación';
-                    
-                    if (error.status === 401) {
-                        errorMsg = 'Debes iniciar sesión para esta acción';
-                    } else if (error.status === 400) {
-                        errorMsg = error.message || 'No se pudo completar la acción';
-                    } else if (error.status === 500) {
-                        errorMsg = 'Error interno del servidor';
-                    }
-                    
-                    showNotification(errorMsg, 'error');
-                })
-                .finally(() => {
-                    button.innerHTML = originalHtml.replace('Procesando...', '');
-                    button.disabled = false;
-                });
-            }
+			function darNoMeGusta(articuloId, button) {
+			    const originalHtml = button.innerHTML;
+			    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+			    button.disabled = true;
+			    
+			    fetch(`/articulo/${articuloId}/no-me-gusta`, {
+			        method: 'POST',
+			        headers: {
+			            'Content-Type': 'application/json',
+			            'X-Requested-With': 'XMLHttpRequest',
+			            'X-CSRF-TOKEN': getCSRFToken()
+			        },
+			        credentials: 'same-origin'
+			    })
+			    .then(response => {
+			        if (!response.ok) {
+			            return response.json().then(err => { 
+			                err.status = response.status;
+			                throw err;
+			            });
+			        }
+			        return response.json();
+			    })
+			    .then(data => {
+			        if (data.success) {
+			            showNotification(data.message || 'No me gusta registrado', 'success');
+			            // Recargar la página después de 1 segundo
+			            setTimeout(() => {
+			                window.location.reload();
+			            }, 1000);
+			        } else {
+			            showNotification(data.message || 'No se pudo registrar el no me gusta', 'error');
+			        }
+			    })
+			    .catch(error => {
+			        console.error('Error:', error);
+			        let errorMsg = error.message || 'Error en la operación';
+			        
+			        if (error.status === 401) {
+			            errorMsg = 'Debes iniciar sesión para esta acción';
+			        } else if (error.status === 400) {
+			            errorMsg = error.message || 'No se pudo completar la acción';
+			        } else if (error.status === 500) {
+			            errorMsg = 'Error interno del servidor';
+			        }
+			        
+			        showNotification(errorMsg, 'error');
+			    })
+			    .finally(() => {
+			        button.innerHTML = originalHtml.replace('Procesando...', '');
+			        button.disabled = false;
+			    });
+			}
 
             function obtenerIdArticulo() {
                 const path = window.location.pathname;

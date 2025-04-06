@@ -1,6 +1,7 @@
 package services;
 
 import models.NoticiaPropia;
+import play.Logger;
 import dataBase.DB_Connection;
 
 import javax.inject.Inject;
@@ -189,6 +190,213 @@ public class NoticiasPropiasService {
             statement.setInt(10, noticia.getIdNoticia());
 
             return statement.executeUpdate() > 0;
+        }
+    }
+    
+    public boolean darLikeNoticia(int idNoticia, int idUsuario) throws SQLException {
+        // Verificar si el usuario es el autor de la noticia
+        NoticiaPropia noticia = obtenerNoticiaPorId(idNoticia);
+        if (noticia != null && noticia.getIdUsuario() == idUsuario) {
+            Logger.debug("Usuario {} intentó dar like a su propia noticia {}", idUsuario, idNoticia);
+            return false;
+        }
+
+        try (Connection connection = dbConnection.getConnection()) {
+            connection.setAutoCommit(false);
+
+            // 1. Verificar si ya existe una reacción
+            String checkQuery = "SELECT Tipo_Like FROM Usuario_Noticia_Like WHERE ID_Usuario = ? AND ID_Noticia = ?";
+            try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+                checkStmt.setInt(1, idUsuario);
+                checkStmt.setInt(2, idNoticia);
+                
+                ResultSet rs = checkStmt.executeQuery();
+                if (rs.next()) {
+                    String tipoLike = rs.getString("Tipo_Like");
+                    if ("ME_GUSTA".equals(tipoLike)) {
+                        return false; // Ya dio like antes
+                    } else {
+                        // Cambiar de dislike a like
+                        return cambiarReaccionNoticia(connection, idNoticia, idUsuario, "NO_ME_GUSTA", "ME_GUSTA");
+                    }
+                }
+            }
+
+            // 2. Registrar nuevo like
+            String insertQuery = "INSERT INTO Usuario_Noticia_Like (ID_Usuario, ID_Noticia, Tipo_Like) VALUES (?, ?, 'ME_GUSTA')";
+            String updateQuery = "UPDATE Noticia SET Me_Gusta = Me_Gusta + 1 WHERE ID_Noticia = ?";
+            
+            try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery);
+                 PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
+                
+                // Insertar like
+                insertStmt.setInt(1, idUsuario);
+                insertStmt.setInt(2, idNoticia);
+                if (insertStmt.executeUpdate() == 0) {
+                    connection.rollback();
+                    return false;
+                }
+                
+                // Actualizar contador
+                updateStmt.setInt(1, idNoticia);
+                if (updateStmt.executeUpdate() == 0) {
+                    connection.rollback();
+                    return false;
+                }
+                
+                connection.commit();
+                return true;
+            }
+        }
+    }
+
+    private boolean cambiarReaccionNoticia(Connection connection, int idNoticia, int idUsuario, 
+                                         String viejoTipo, String nuevoTipo) throws SQLException {
+        String updateLikeQuery = "UPDATE Usuario_Noticia_Like SET Tipo_Like = ? WHERE ID_Usuario = ? AND ID_Noticia = ?";
+        String decrementQuery = "UPDATE Noticia SET " + 
+                              (viejoTipo.equals("ME_GUSTA") ? "Me_Gusta" : "No_Me_Gusta") + 
+                              " = " + (viejoTipo.equals("ME_GUSTA") ? "Me_Gusta" : "No_Me_Gusta") + " - 1 " +
+                              "WHERE ID_Noticia = ?";
+        String incrementQuery = "UPDATE Noticia SET " + 
+                              (nuevoTipo.equals("ME_GUSTA") ? "Me_Gusta" : "No_Me_Gusta") + 
+                              " = " + (nuevoTipo.equals("ME_GUSTA") ? "Me_Gusta" : "No_Me_Gusta") + " + 1 " +
+                              "WHERE ID_Noticia = ?";
+        
+        try (PreparedStatement updateLikeStmt = connection.prepareStatement(updateLikeQuery);
+             PreparedStatement decrementStmt = connection.prepareStatement(decrementQuery);
+             PreparedStatement incrementStmt = connection.prepareStatement(incrementQuery)) {
+            
+            // Actualizar tipo de reacción
+            updateLikeStmt.setString(1, nuevoTipo);
+            updateLikeStmt.setInt(2, idUsuario);
+            updateLikeStmt.setInt(3, idNoticia);
+            updateLikeStmt.executeUpdate();
+            
+            // Decrementar el viejo contador
+            decrementStmt.setInt(1, idNoticia);
+            decrementStmt.executeUpdate();
+            
+            // Incrementar el nuevo contador
+            incrementStmt.setInt(1, idNoticia);
+            incrementStmt.executeUpdate();
+            
+            connection.commit();
+            return true;
+        } catch (SQLException e) {
+            connection.rollback();
+            throw e;
+        }
+    }
+
+    public NoticiaPropia obtenerNoticiaPorIdConLikes(int idNoticia, Integer idUsuario) throws SQLException {
+        String query = "SELECT n.*, c.Nombre AS Categoria, " +
+                     "(SELECT COUNT(*) FROM Usuario_Noticia_Like WHERE ID_Noticia = n.ID_Noticia AND Tipo_Like = 'ME_GUSTA') AS Me_Gusta, " +
+                     "(SELECT COUNT(*) FROM Usuario_Noticia_Like WHERE ID_Noticia = n.ID_Noticia AND Tipo_Like = 'NO_ME_GUSTA') AS No_Me_Gusta";
+        
+        if (idUsuario != null) {
+            query += ", EXISTS(SELECT 1 FROM Usuario_Noticia_Like WHERE ID_Noticia = n.ID_Noticia AND ID_Usuario = ? AND Tipo_Like = 'ME_GUSTA') AS UsuarioDioLike, " +
+                    "EXISTS(SELECT 1 FROM Usuario_Noticia_Like WHERE ID_Noticia = n.ID_Noticia AND ID_Usuario = ? AND Tipo_Like = 'NO_ME_GUSTA') AS UsuarioDioNoMeGusta";
+        } else {
+            query += ", false AS UsuarioDioLike, false AS UsuarioDioNoMeGusta";
+        }
+        
+        query += " FROM Noticia n " +
+                "LEFT JOIN Categoria c ON n.Categoria_ID = c.ID_Categoria " +
+                "WHERE n.ID_Noticia = ?";
+        
+        try (Connection connection = dbConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            
+            int paramIndex = 1;
+            if (idUsuario != null) {
+                statement.setInt(paramIndex++, idUsuario);
+                statement.setInt(paramIndex++, idUsuario);
+            }
+            statement.setInt(paramIndex, idNoticia);
+            
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    NoticiaPropia noticia = new NoticiaPropia();
+                    noticia.setIdNoticia(rs.getInt("ID_Noticia"));
+                    noticia.setIdUsuario(rs.getInt("ID_Usuario"));
+                    noticia.setTitulo(rs.getString("Titulo"));
+                    noticia.setAutor(rs.getString("Autor"));
+                    noticia.setUrl(rs.getString("URL"));
+                    noticia.setFuente(rs.getString("Fuente"));
+                    noticia.setDescripcion(rs.getString("Descripcion"));
+                    noticia.setImagen(rs.getString("Imagen"));
+                    noticia.setContenido(rs.getString("Contenido"));
+                    noticia.setFechaPublicacion(rs.getDate("Fecha_Publicacion"));
+                    noticia.setEstado(rs.getString("Estado"));
+                    noticia.setCategoria(rs.getString("Categoria"));
+                    noticia.setMeGusta(rs.getInt("Me_Gusta"));
+                    noticia.setNoMeGusta(rs.getInt("No_Me_Gusta"));
+                    
+                    if (idUsuario != null) {
+                        noticia.setUsuarioDioLike(rs.getBoolean("UsuarioDioLike"));
+                        noticia.setUsuarioDioNoMeGusta(rs.getBoolean("UsuarioDioNoMeGusta"));
+                    }
+                    
+                    return noticia;
+                }
+            }
+        }
+        return null;
+    }
+    public boolean darNoMeGustaNoticia(int idNoticia, int idUsuario) throws SQLException {
+        // Verificar si el usuario es el autor de la noticia
+        NoticiaPropia noticia = obtenerNoticiaPorId(idNoticia);
+        if (noticia != null && noticia.getIdUsuario() == idUsuario) {
+            Logger.debug("Usuario {} intentó dar dislike a su propia noticia {}", idUsuario, idNoticia);
+            return false;
+        }
+
+        try (Connection connection = dbConnection.getConnection()) {
+            connection.setAutoCommit(false);
+
+            // 1. Verificar si ya existe una reacción
+            String checkQuery = "SELECT Tipo_Like FROM Usuario_Noticia_Like WHERE ID_Usuario = ? AND ID_Noticia = ?";
+            try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+                checkStmt.setInt(1, idUsuario);
+                checkStmt.setInt(2, idNoticia);
+                
+                ResultSet rs = checkStmt.executeQuery();
+                if (rs.next()) {
+                    String tipoLike = rs.getString("Tipo_Like");
+                    if ("NO_ME_GUSTA".equals(tipoLike)) {
+                        return false; // Ya dio dislike antes
+                    } else {
+                        // Cambiar de like a dislike
+                        return cambiarReaccionNoticia(connection, idNoticia, idUsuario, "ME_GUSTA", "NO_ME_GUSTA");
+                    }
+                }
+            }
+
+            // 2. Registrar nuevo dislike
+            String insertQuery = "INSERT INTO Usuario_Noticia_Like (ID_Usuario, ID_Noticia, Tipo_Like) VALUES (?, ?, 'NO_ME_GUSTA')";
+            String updateQuery = "UPDATE Noticia SET No_Me_Gusta = No_Me_Gusta + 1 WHERE ID_Noticia = ?";
+            
+            try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery);
+                 PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
+                
+                // Insertar dislike
+                insertStmt.setInt(1, idUsuario);
+                insertStmt.setInt(2, idNoticia);
+                if (insertStmt.executeUpdate() == 0) {
+                    connection.rollback();
+                    return false;
+                }
+                
+                // Actualizar contador
+                updateStmt.setInt(1, idNoticia);
+                if (updateStmt.executeUpdate() == 0) {
+                    connection.rollback();
+                    return false;
+                }
+                
+                connection.commit();
+                return true;
+            }
         }
     }
 }

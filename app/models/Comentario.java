@@ -9,7 +9,7 @@ public class Comentario {
     private String tipoContenido; // "ARTICULO" o "NOTICIA"
     private String contenido;
     private Date fechaCreacion;
-    private String estado; // "ACTIVO", "ELIMINADO", etc.
+    private String estado; // 
     private Usuario usuario; // Para mostrar información del autor
 
     // Constructor vacío
