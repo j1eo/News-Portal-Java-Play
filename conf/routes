@@ -57,8 +57,9 @@ POST    /articulo/:id/like               controllers.ArticulosController.darLike
 POST    /articulo/:id/no-me-gusta        controllers.ArticulosController.darNoMeGusta(id: Int)
 
 # Comentarios
-POST    /comentario/articulo    controllers.ComentariosController.agregarComentarioArticulo()
-POST    /comentario/noticia     controllers.ComentariosController.agregarComentarioNoticia()
+GET     /comentarios/:idArticulo      controllers.ComentariosController.obtenerComentarios(idArticulo: Integer)
+POST    /articulo/:id/comentario      controllers.ComentariosController.agregarComentario(id: Integer)
+DELETE  /comentario/:id               controllers.ComentariosController.eliminarComentario(id: Integer)
 
 # Noticias Propias
 GET     /noticias-propias/crear                 controllers.NoticiasPropiasController.mostrarFormularioCreacion()

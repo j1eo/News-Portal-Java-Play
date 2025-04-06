@@ -89,7 +89,7 @@ public class Comentario {
     }
 
     public void setEstado(String estado) {
-        if (!"PUBLICADO".equals(estado) && !"ELIMINADO".equals(estado) && !"PENDIENTE".equals(estado)) {
+        if (!"PUBLICADO".equals(estado) && !"ELIMINADO".equals(estado)) {
             throw new IllegalArgumentException("Estado no válido");
         }
         this.estado = estado;
@@ -129,4 +129,5 @@ public class Comentario {
     public boolean esDeNoticia() {
         return "NOTICIA".equals(this.tipoContenido);
     }
+    
 }

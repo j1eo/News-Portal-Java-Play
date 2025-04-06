@@ -103,14 +103,27 @@
                 <!-- Sección de comentarios -->
                 <section class="article-comments-section">
                     <h2><i class="fas fa-comments"></i> Comentarios</h2>
-                    <div class="article-comment-form">
-                        <textarea placeholder="Escribe tu comentario..."></textarea>
-                        <button class="action-btn">
-                            <i class="fas fa-paper-plane"></i> Publicar comentario
-                        </button>
-                    </div>
+                    
+                    @if(usuario != null) {
+                        <div class="article-comment-form">
+                            <textarea id="comment-text" placeholder="Escribe tu comentario..." maxlength="500"></textarea>
+                            <div class="char-counter" style="text-align: right; font-size: 0.8em; color: #666; margin-bottom: 10px;">
+                                <span id="char-count">0</span>/500 caracteres
+                            </div>
+                            <button class="action-btn" id="submit-comment">
+                                <i class="fas fa-paper-plane"></i> Publicar comentario
+                            </button>
+                        </div>
+                    } else {
+                        <div class="login-prompt">
+                            <a href="@routes.AuthController.login()" class="action-btn">
+                                <i class="fas fa-sign-in-alt"></i> Inicia sesión para comentar
+                            </a>
+                        </div>
+                    }
+                    
                     <div class="comments-list">
-                        <p>No hay comentarios aún. Sé el primero en comentar.</p>
+                        <p class="loading-comments"><i class="fas fa-spinner fa-spin"></i> Cargando comentarios...</p>
                     </div>
                 </section>
             </div>
@@ -309,7 +322,7 @@
             .article-comment-form textarea {
                 width: 100%;
                 min-height: 120px;
-                margin-bottom: 15px;
+                margin-bottom: 10px;
                 padding: 15px;
                 border: 1px solid #ddd;
                 border-radius: 6px;
@@ -324,146 +337,481 @@
                 outline: none;
             }
 
+            /* Estilos para la sección de comentarios */
             .comments-list {
                 margin-top: 25px;
-                color: #555;
-                font-size: 0.95em;
+            }
+
+            .loading-comments, .error-loading {
+                padding: 15px;
+                text-align: center;
+                color: #666;
+                background: #f9f9f9;
+                border-radius: 5px;
+                margin-bottom: 20px;
+            }
+
+            .error-loading {
+                color: #d32f2f;
+                background: #ffebee;
+            }
+
+            .comment-item {
+                padding: 15px;
+                margin-bottom: 15px;
+                background: #fff;
+                border-radius: 5px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                border: 1px solid #eee;
+            }
+
+            .comment-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .comment-avatar {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                margin-right: 10px;
+                object-fit: cover;
+            }
+
+            .comment-meta {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .comment-author {
+                font-weight: bold;
+                color: #333;
+            }
+
+            .comment-date {
+                font-size: 0.8em;
+                color: #888;
+            }
+
+            .comment-content {
+                margin: 10px 0;
+                line-height: 1.5;
+                color: #333;
+            }
+
+            .comment-actions {
+                text-align: right;
+            }
+
+            .comment-action-btn {
+                background: none;
+                border: none;
+                color: #d32f2f;
+                cursor: pointer;
+                font-size: 0.9em;
+                padding: 5px 10px;
+                border-radius: 3px;
+            }
+
+            .comment-action-btn:hover {
+                background: #ffebee;
+            }
+
+            .no-comments {
+                text-align: center;
+                color: #666;
+                font-style: italic;
+                padding: 20px;
             }
         </style>
 
         <script>
+            // Función para obtener el token CSRF
+            function getCSRFToken() {
+                const meta = document.querySelector('meta[name="csrf-token"]');
+                return meta ? meta.content : '';
+            }
+
             function confirmLogout() {
                 return confirm("¿Estás seguro que deseas cerrar sesión?");
             }
 
-			function darLike(articuloId, button) {
-			    const originalHtml = button.innerHTML;
-			    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
-			    button.disabled = true;
-			    
-			    fetch(`/articulo/${articuloId}/like`, {
-			        method: 'POST',
-			        headers: {
-			            'Content-Type': 'application/json',
-			            'X-Requested-With': 'XMLHttpRequest'
-			        },
-			        credentials: 'same-origin'
-			    })
-			    .then(response => {
-			        if (!response.ok) {
-			            return response.json().then(err => { 
-			                // Agregar el código de estado al error para mejor diagnóstico
-			                err.status = response.status;
-			                throw err;
-			            });
-			        }
-			        return response.json();
-			    })
-			    .then(data => {
-			        if (data.success) {
-			            // Actualizar contador de likes
-			            const likeCount = document.getElementById(`like-count-${articuloId}`);
-			            likeCount.textContent = data.nuevoTotal || (parseInt(likeCount.textContent) + 1);
-			            
-			            // Marcar botón como activo
-			            button.classList.add('active-like');
-			            
-			            // Si había un dislike activo, quitarlo
-			            const dislikeBtn = document.querySelector(`button[onclick*="darNoMeGusta(${articuloId}"]`);
-			            if (dislikeBtn && dislikeBtn.classList.contains('active-dislike')) {
-			                const dislikeCount = document.getElementById(`dislike-count-${articuloId}`);
-			                dislikeCount.textContent = parseInt(dislikeCount.textContent) - 1;
-			                dislikeBtn.classList.remove('active-dislike');
-			            }
-			            
-			            showNotification(data.message || '¡Like registrado!', 'success');
-			        } else {
-			            showNotification(data.message || 'No se pudo registrar el like', 'error');
-			        }
-			    })
-			    .catch(error => {
-			        console.error('Error:', error);
-			        let errorMsg = error.message || 'Error en la operación';
-			        
-			        // Mensajes más específicos según el código de estado
-			        if (error.status === 401) {
-			            errorMsg = 'Debes iniciar sesión para esta acción';
-			        } else if (error.status === 400) {
-			            errorMsg = error.message || 'No se pudo completar la acción';
-			        } else if (error.status === 500) {
-			            errorMsg = 'Error interno del servidor';
-			        }
-			        
-			        showNotification(errorMsg, 'error');
-			    })
-			    .finally(() => {
-			        button.innerHTML = originalHtml.replace('Procesando...', '');
-			        button.disabled = false;
-			    });
-			}
-			function darNoMeGusta(articuloId, button) {
-			    const originalHtml = button.innerHTML;
-			    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
-			    button.disabled = true;
-			    
-			    fetch(`/articulo/${articuloId}/no-me-gusta`, {
-			        method: 'POST',
-			        headers: {
-			            'Content-Type': 'application/json',
-			            'X-Requested-With': 'XMLHttpRequest'
-			        },
-			        credentials: 'same-origin'
-			    })
-			    .then(response => {
-			        if (!response.ok) {
-			            return response.json().then(err => { 
-			                err.status = response.status;
-			                throw err;
-			            });
-			        }
-			        return response.json();
-			    })
-			    .then(data => {
-			        if (data.success) {
-			            // Actualizar contador de no me gusta
-			            const dislikeCount = document.getElementById(`dislike-count-${articuloId}`);
-			            dislikeCount.textContent = data.nuevoTotal || (parseInt(dislikeCount.textContent) + 1);
-			            
-			            // Marcar botón como activo
-			            button.classList.add('active-dislike');
-			            
-			            // Si había un like activo, quitarlo
-			            const likeBtn = document.querySelector(`button[onclick*="darLike(${articuloId}"]`);
-			            if (likeBtn && likeBtn.classList.contains('active-like')) {
-			                const likeCount = document.getElementById(`like-count-${articuloId}`);
-			                likeCount.textContent = parseInt(likeCount.textContent) - 1;
-			                likeBtn.classList.remove('active-like');
-			            }
-			            
-			            showNotification(data.message || 'No me gusta registrado', 'success');
-			        } else {
-			            showNotification(data.message || 'No se pudo registrar el no me gusta', 'error');
-			        }
-			    })
-			    .catch(error => {
-			        console.error('Error:', error);
-			        let errorMsg = error.message || 'Error en la operación';
-			        
-			        if (error.status === 401) {
-			            errorMsg = 'Debes iniciar sesión para esta acción';
-			        } else if (error.status === 400) {
-			            errorMsg = error.message || 'No se pudo completar la acción';
-			        } else if (error.status === 500) {
-			            errorMsg = 'Error interno del servidor';
-			        }
-			        
-			        showNotification(errorMsg, 'error');
-			    })
-			    .finally(() => {
-			        button.innerHTML = originalHtml.replace('Procesando...', '');
-			        button.disabled = false;
-			    });
-			}
+            function darLike(articuloId, button) {
+                const originalHtml = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+                button.disabled = true;
+                
+                fetch(`/articulo/${articuloId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': getCSRFToken()
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { 
+                            err.status = response.status;
+                            throw err;
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const likeCount = document.getElementById(`like-count-${articuloId}`);
+                        likeCount.textContent = data.nuevoTotal || (parseInt(likeCount.textContent) + 1);
+                        
+                        button.classList.add('active-like');
+                        
+                        const dislikeBtn = document.querySelector(`button[onclick*="darNoMeGusta(${articuloId}"]`);
+                        if (dislikeBtn && dislikeBtn.classList.contains('active-dislike')) {
+                            const dislikeCount = document.getElementById(`dislike-count-${articuloId}`);
+                            dislikeCount.textContent = parseInt(dislikeCount.textContent) - 1;
+                            dislikeBtn.classList.remove('active-dislike');
+                        }
+                        
+                        showNotification(data.message || '¡Like registrado!', 'success');
+                    } else {
+                        showNotification(data.message || 'No se pudo registrar el like', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    let errorMsg = error.message || 'Error en la operación';
+                    
+                    if (error.status === 401) {
+                        errorMsg = 'Debes iniciar sesión para esta acción';
+                    } else if (error.status === 400) {
+                        errorMsg = error.message || 'No se pudo completar la acción';
+                    } else if (error.status === 500) {
+                        errorMsg = 'Error interno del servidor';
+                    }
+                    
+                    showNotification(errorMsg, 'error');
+                })
+                .finally(() => {
+                    button.innerHTML = originalHtml.replace('Procesando...', '');
+                    button.disabled = false;
+                });
+            }
+
+            function darNoMeGusta(articuloId, button) {
+                const originalHtml = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+                button.disabled = true;
+                
+                fetch(`/articulo/${articuloId}/no-me-gusta`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': getCSRFToken()
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { 
+                            err.status = response.status;
+                            throw err;
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const dislikeCount = document.getElementById(`dislike-count-${articuloId}`);
+                        dislikeCount.textContent = data.nuevoTotal || (parseInt(dislikeCount.textContent) + 1);
+                        
+                        button.classList.add('active-dislike');
+                        
+                        const likeBtn = document.querySelector(`button[onclick*="darLike(${articuloId}"]`);
+                        if (likeBtn && likeBtn.classList.contains('active-like')) {
+                            const likeCount = document.getElementById(`like-count-${articuloId}`);
+                            likeCount.textContent = parseInt(likeCount.textContent) - 1;
+                            likeBtn.classList.remove('active-like');
+                        }
+                        
+                        showNotification(data.message || 'No me gusta registrado', 'success');
+                    } else {
+                        showNotification(data.message || 'No se pudo registrar el no me gusta', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    let errorMsg = error.message || 'Error en la operación';
+                    
+                    if (error.status === 401) {
+                        errorMsg = 'Debes iniciar sesión para esta acción';
+                    } else if (error.status === 400) {
+                        errorMsg = error.message || 'No se pudo completar la acción';
+                    } else if (error.status === 500) {
+                        errorMsg = 'Error interno del servidor';
+                    }
+                    
+                    showNotification(errorMsg, 'error');
+                })
+                .finally(() => {
+                    button.innerHTML = originalHtml.replace('Procesando...', '');
+                    button.disabled = false;
+                });
+            }
+
+            function obtenerIdArticulo() {
+                const path = window.location.pathname;
+                const matches = path.match(/\/articulo\/(\d+)/);
+                return matches ? parseInt(matches[1]) : null;
+            }
+
+            function cargarComentarios() {
+                const idArticulo = obtenerIdArticulo();
+                if (!idArticulo) return;
+
+                const commentsList = document.querySelector('.comments-list');
+                commentsList.innerHTML = '<p class="loading-comments"><i class="fas fa-spinner fa-spin"></i> Cargando comentarios...</p>';
+
+                fetch(`/comentarios/${idArticulo}`, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP! estado: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(comentarios => {
+                    if (comentarios.length === 0) {
+                        commentsList.innerHTML = '<p class="no-comments">No hay comentarios aún. ¡Sé el primero en comentar!</p>';
+                        return;
+                    }
+                    renderizarComentarios(comentarios);
+                })
+                .catch(error => {
+                    console.error('Error al cargar comentarios:', error);
+                    commentsList.innerHTML = `<p class="error-loading"><i class="fas fa-exclamation-triangle"></i> Error al cargar comentarios: ${error.message}</p>`;
+                });
+            }
+
+            function renderizarComentarios(comentarios) {
+                const commentsList = document.querySelector('.comments-list');
+                let html = '';
+
+                comentarios.forEach(c => {
+                    const fecha = new Date(c.fecha).toLocaleString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    const puedeEliminar = c.usuario.id === obtenerIdUsuario() || esAdmin();
+                    
+                    html += `
+                        <div class="comment-item" data-comment-id="${c.id}">
+                            <div class="comment-header">
+                                <img src="${c.usuario.foto || '/assets/images/default-avatar.png'}" 
+                                     alt="${c.usuario.nombre}" class="comment-avatar">
+                                <div class="comment-meta">
+                                    <span class="comment-author">${c.usuario.nombre}</span>
+                                    <span class="comment-date">${fecha}</span>
+                                </div>
+                            </div>
+                            <div class="comment-content">${c.contenido}</div>
+                            ${puedeEliminar ? `
+                            <div class="comment-actions">
+                                <button class="comment-action-btn" onclick="eliminarComentario(${c.id}, this)">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+
+                commentsList.innerHTML = html;
+            }
+
+            function publicarComentario() {
+                const idArticulo = obtenerIdArticulo();
+                const textarea = document.getElementById('comment-text');
+                const contenido = textarea.value.trim();
+                const button = document.getElementById('submit-comment');
+				console.log("Intentando publicar comentario:", {idArticulo, contenido}); 
+                
+                if (!contenido) {
+                    showNotification('El comentario no puede estar vacío', 'error');
+                    textarea.focus();
+                    return;
+                }
+
+                if (contenido.length > 500) {
+                    showNotification('El comentario no puede exceder los 500 caracteres', 'error');
+                    return;
+                }
+
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publicando...';
+                button.disabled = true;
+
+                fetch(`/articulo/${idArticulo}/comentario`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCSRFToken()
+                    },
+                    body: JSON.stringify({ contenido: contenido }),
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    showNotification('Comentario publicado exitosamente', 'success');
+                    textarea.value = '';
+                    document.getElementById('char-count').textContent = '0';
+                    cargarComentarios();
+                })
+                .catch(error => {
+                    console.error('Error al publicar comentario:', error);
+                    showNotification(error.message || 'Error al publicar comentario', 'error');
+                })
+                .finally(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                });
+            }
+
+            function eliminarComentario(idComentario, button) {
+                if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+                    return;
+                }
+
+                const originalHtml = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                button.disabled = true;
+
+                fetch(`/comentario/${idComentario}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': getCSRFToken()
+                    },
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showNotification('Comentario eliminado', 'success');
+                        button.closest('.comment-item').remove();
+                    } else {
+                        throw new Error(data.message || 'Error al eliminar comentario');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al eliminar comentario:', error);
+                    showNotification(error.message || 'Error al eliminar comentario', 'error');
+                })
+                .finally(() => {
+                    button.innerHTML = originalHtml;
+                    button.disabled = false;
+                });
+            }
+
+            function obtenerIdUsuario() {
+                const token = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+                if (!token) return null;
+                
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    return parseInt(payload.sub);
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function esAdmin() {
+                const token = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+                if (!token) return false;
+                
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    return payload.role === 'admin';
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function actualizarContador() {
+                const textarea = document.getElementById('comment-text');
+                const counter = document.getElementById('char-count');
+                counter.textContent = textarea.value.length;
+            }
+
+            function showNotification(mensaje, tipo) {
+                // Implementación básica si no tienes Toastify
+                const notification = document.createElement('div');
+                notification.style.position = 'fixed';
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.padding = '15px';
+                notification.style.borderRadius = '5px';
+                notification.style.color = 'white';
+                notification.style.backgroundColor = tipo === 'success' ? '#4CAF50' : '#F44336';
+                notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+                notification.style.zIndex = '1000';
+                notification.style.animation = 'fadeIn 0.3s';
+                notification.textContent = mensaje;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.3s';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+            // Inicialización cuando el DOM esté listo
+            document.addEventListener('DOMContentLoaded', function() {
+                // Configurar el botón de comentario
+                const commentButton = document.getElementById('submit-comment');
+                if (commentButton) {
+                    commentButton.addEventListener('click', publicarComentario);
+                }
+                
+                // Configurar el contador de caracteres
+                const commentTextarea = document.getElementById('comment-text');
+                if (commentTextarea) {
+                    commentTextarea.addEventListener('input', actualizarContador);
+                    
+                    // Permitir Ctrl+Enter para enviar comentario
+                    commentTextarea.addEventListener('keydown', function(e) {
+                        if (e.ctrlKey && e.key === 'Enter') {
+                            publicarComentario();
+                        }
+                    });
+                }
+                
+                // Cargar comentarios iniciales
+                cargarComentarios();
+            });
         </script>
     </div>
 }
