@@ -56,12 +56,13 @@
                 </form>
             </div>
             
-            <div class="sidenav-links">
-                <a href="#"><i class="fas fa-map-marker-alt"></i> Noticias Locales</a>
-                <a href="#"><i class="fas fa-globe-americas"></i> Noticias Nacionales</a>
-                <a href="@routes.ArticulosController.listarArticulos()"><i class="fas fa-file-alt"></i> Artículos</a>
-                <a href="#"><i class="fas fa-question-circle"></i> Preguntas Frecuentes</a>
-            </div>
+			<div class="sidenav-links">
+			    <a href="@routes.UserController.dashboard()"><i class="fas fa-globe-americas"></i> Todas las Noticias</a>
+			    <a href="@routes.NoticiasPropiasController.listarNoticias()"><i class="fas fa-calendar"></i> Nuestras Noticias</a>
+			    <a href="@routes.ArticulosController.listarArticulos()"><i class="fas fa-file-alt"></i> Artículos</a>
+			    <a href="https://www.milenio.com" target="_blank" rel="noopener noreferrer"><i class="fas fa-newspaper"></i> Milenio</a>
+			    <a href="https://elpais.com/mexico/" target="_blank" rel="noopener noreferrer"><i class="fas fa-newspaper"></i> El País</a>
+			</div>
         </div>
         
         <!-- Overlay para cerrar el sidenav -->
