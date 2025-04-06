@@ -1,0 +1,537 @@
+	@(noticia: models.NoticiaPropia, relacionados: List[NoticiaPropia], usuario: models.Usuario, message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
+	
+	@user.userbanner("Detalle de Noticia", message) {
+	    <div class="user-dashboard-container">
+	        <!-- Barra superior con información de usuario -->
+	        @if(usuario != null && usuario.getNombre() != null) {
+	            <div class="user-header">
+	                <div class="user-greeting">
+	                    <i class="fas fa-user-circle"></i>
+	                    <span>Bienvenido, <strong>@usuario.getNombre()</strong></span>
+	                </div>
+	                <a href="@routes.AuthController.logout()" class="logout-btn" onclick="return confirmLogout()">
+	                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+	                </a>
+	            </div>
+	        } else {
+	            <div class="user-header">
+	                <div class="user-greeting">
+	                    <i class="fas fa-user-circle"></i>
+	                    <span>Bienvenido, <strong>Invitado</strong></span>
+	                </div>
+	            </div>
+	        }
+	
+	        <!-- Contenido principal del dashboard -->
+	        <div class="dashboard-content">
+	            <div class="article-detail-container">
+	                <!-- Ruta de navegación -->
+	                <div class="article-breadcrumb">
+	                    <a href="@routes.UserController.dashboard()">Dashboard</a> > 
+	                    <a href="@routes.NoticiasPropiasController.listarNoticias()">Noticias</a> > 
+	                    <span>@noticia.getTitulo()</span>
+	                </div>
+	
+	                <!-- Contenido principal de la noticia -->
+	                <article class="article-content">
+	                    <div class="article-header">
+	                        <h1>@noticia.getTitulo()</h1>
+	                        <div class="article-meta-info">
+	                            <span class="author">
+	                                <i class="fas fa-user-edit"></i> 
+	                                Por @noticia.getAutor()
+	                            </span>
+	                            <span class="date">
+	                                <i class="far fa-calendar-alt"></i> 
+	                                @noticia.getFechaPublicacion()
+	                            </span>
+	                            <span class="category">
+	                                <i class="fas fa-tag"></i> 
+	                                @noticia.getCategoria()
+	                            </span>
+	                            @if(noticia.getFuente() != null && !noticia.getFuente().isEmpty()) {
+	                                <span class="source">
+	                                    <i class="fas fa-newspaper"></i> 
+	                                    Fuente: @noticia.getFuente()
+	                                </span>
+	                            }
+	                        </div>
+	                    </div>
+	
+	                    @if(noticia.getImagen() != null && !noticia.getImagen().isEmpty()) {
+	                        <div class="article-main-image">
+	                            <img src="@noticia.getImagen()" alt="@noticia.getTitulo()">
+	                        </div>
+	                    }
+	
+	                    <div class="article-body-content">
+	                        @Html(noticia.getContenido())
+	                    </div>
+	
+	                    @if(noticia.getUrl() != null && !noticia.getUrl().isEmpty()) {
+	                        <div class="article-external-link">
+	                            <a href="@noticia.getUrl()" target="_blank" class="action-btn">
+	                                <i class="fas fa-external-link-alt"></i> Ver noticia original
+	                            </a>
+	                        </div>
+	                    }
+	
+						<div class="article-actions-container">
+						    @if(usuario != null) {
+						        <button class="action-btn @if(noticia.isUsuarioDioLike()){active-like}" 
+						                onclick="darLikeNoticia(@noticia.getIdNoticia(), this)">
+						            <i class="fas fa-thumbs-up"></i> Me gusta (<span id="like-count-@noticia.getIdNoticia()">@noticia.getMeGusta()</span>)
+						        </button>
+						        <button class="action-btn @if(noticia.isUsuarioDioNoMeGusta()){active-dislike}" 
+						                onclick="darNoMeGustaNoticia(@noticia.getIdNoticia(), this)">
+						            <i class="fas fa-thumbs-down"></i> No me gusta (<span id="dislike-count-@noticia.getIdNoticia()">@noticia.getNoMeGusta()</span>)
+						        </button>
+						    } else {
+						        <button class="action-btn" disabled title="Debes iniciar sesión">
+						            <i class="fas fa-thumbs-up"></i> Me gusta (@noticia.getMeGusta())
+						        </button>
+						        <button class="action-btn" disabled title="Debes iniciar sesión">
+						            <i class="fas fa-thumbs-down"></i> No me gusta (@noticia.getNoMeGusta())
+						        </button>
+						    }
+						</div>
+	                </article>
+	
+	                <!-- Noticias relacionadas -->
+	                @if(!relacionados.isEmpty()) {
+	                    <section class="article-related-section">
+	                        <h2><i class="fas fa-link"></i> Noticias relacionadas</h2>
+	                        <div class="article-related-grid">
+	                            @for(rel <- relacionados) {
+	                                <div class="article-related-item">
+	                                    @if(rel.getImagen() != null && !rel.getImagen().isEmpty()) {
+	                                        <img src="@rel.getImagen()" alt="@rel.getTitulo()">
+	                                    }
+	                                    <h3>@rel.getTitulo()</h3>
+	                                    <a href="@routes.NoticiasPropiasController.mostrarNoticia(rel.getIdNoticia())" class="action-btn">
+	                                        <i class="fas fa-book-reader"></i> Leer más
+	                                    </a>
+	                                </div>
+	                            }
+	                        </div>
+	                    </section>
+	                }
+	
+					<!-- Sección de comentarios -->
+					<section class="article-comments-section">
+					    <h2><i class="fas fa-comments"></i> Comentarios</h2>
+					    
+					    @if(usuario != null) {
+					        <div class="article-comment-form">
+					            <textarea id="comment-text" placeholder="Escribe tu comentario..." maxlength="500"></textarea>
+					            <div class="char-counter" style="text-align: right; font-size: 0.8em; color: #666; margin-bottom: 10px;">
+					                <span id="char-count">0</span>/500 caracteres
+					            </div>
+					            <button class="action-btn" id="submit-comment">
+					                <i class="fas fa-paper-plane"></i> Publicar comentario
+					            </button>
+					        </div>
+					    } else {
+					        <div class="login-prompt">
+					            <a href="@routes.AuthController.login()" class="action-btn">
+					                <i class="fas fa-sign-in-alt"></i> Inicia sesión para comentar
+					            </a>
+					        </div>
+					    }
+					    
+					    <div class="comments-list">
+					        <p class="loading-comments"><i class="fas fa-spinner fa-spin"></i> Cargando comentarios...</p>
+					    </div>
+					</section>
+	            </div>
+	        </div>
+	    </div>
+	
+
+	    
+		<script>
+			function darLikeNoticia(noticiaId, button) {
+			    const originalHtml = button.innerHTML;
+			    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+			    button.disabled = true;
+			    
+			    fetch(`/noticias-propias/${noticiaId}/like`, {
+			        method: 'POST',
+			        headers: {
+			            'Content-Type': 'application/json',
+			            'X-Requested-With': 'XMLHttpRequest',
+			            'X-CSRF-TOKEN': getCSRFToken()
+			        },
+			        credentials: 'same-origin'
+			    })
+			    .then(response => {
+			        if (!response.ok) {
+			            return response.json().then(err => { 
+			                err.status = response.status;
+			                throw err;
+			            });
+			        }
+			        return response.json();
+			    })
+			    .then(data => {
+			        if (data.success) {
+			            showNotification(data.message || '¡Like registrado!', 'success');
+			            // Recargar la página después de 1 segundo
+			            setTimeout(() => {
+			                window.location.reload();
+			            }, 1000);
+			        } else {
+			            showNotification(data.message || 'No se pudo registrar el like', 'error');
+			        }
+			    })
+			    .catch(error => {
+			        console.error('Error:', error);
+			        let errorMsg = error.message || 'Error en la operación';
+			        
+			        if (error.status === 401) {
+			            errorMsg = 'Debes iniciar sesión para esta acción';
+			        } else if (error.status === 400) {
+			            errorMsg = error.message || 'No se pudo completar la acción';
+			        } else if (error.status === 500) {
+			            errorMsg = 'Error interno del servidor';
+			        }
+			        
+			        showNotification(errorMsg, 'error');
+			    })
+			    .finally(() => {
+			        button.innerHTML = originalHtml.replace('Procesando...', '');
+			        button.disabled = false;
+			    });
+			}
+
+			function darNoMeGustaNoticia(noticiaId, button) {
+			    const originalHtml = button.innerHTML;
+			    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+			    button.disabled = true;
+			    
+			    fetch(`/noticias-propias/${noticiaId}/dislike`, {
+			        method: 'POST',
+			        headers: {
+			            'Content-Type': 'application/json',
+			            'X-Requested-With': 'XMLHttpRequest',
+			            'X-CSRF-TOKEN': getCSRFToken()
+			        },
+			        credentials: 'same-origin'
+			    })
+			    .then(response => {
+			        if (!response.ok) {
+			            return response.json().then(err => { 
+			                err.status = response.status;
+			                throw err;
+			            });
+			        }
+			        return response.json();
+			    })
+			    .then(data => {
+			        if (data.success) {
+			            showNotification(data.message || 'No me gusta registrado', 'success');
+			            // Recargar la página después de 1 segundo
+			            setTimeout(() => {
+			                window.location.reload();
+			            }, 1000);
+			        } else {
+			            showNotification(data.message || 'No se pudo registrar el no me gusta', 'error');
+			        }
+			    })
+			    .catch(error => {
+			        console.error('Error:', error);
+			        let errorMsg = error.message || 'Error en la operación';
+			        
+			        if (error.status === 401) {
+			            errorMsg = 'Debes iniciar sesión para esta acción';
+			        } else if (error.status === 400) {
+			            errorMsg = error.message || 'No se pudo completar la acción';
+			        } else if (error.status === 500) {
+			            errorMsg = 'Error interno del servidor';
+			        }
+			        
+			        showNotification(errorMsg, 'error');
+			    })
+			    .finally(() => {
+			        button.innerHTML = originalHtml.replace('Procesando...', '');
+			        button.disabled = false;
+			    });
+			}
+		    // Función para obtener el token CSRF
+		    function getCSRFToken() {
+		        const meta = document.querySelector('meta[name="csrf-token"]');
+		        return meta ? meta.content : '';
+		    }
+
+		    function obtenerIdNoticia() {
+		        const path = window.location.pathname;
+		        console.log('Ruta actual:', path); // Para depuración
+		        
+		        // Patrón para URLs como /noticias-propias/123
+		        const matches = path.match(/\/noticias-propias\/(\d+)/);
+		        if (!matches) {
+		            console.error('No se pudo extraer ID de noticia de la URL:', path);
+		            return null;
+		        }
+		        return parseInt(matches[1]);
+		    }
+
+		    function cargarComentariosNoticia() {
+		        const idNoticia = obtenerIdNoticia();
+		        if (!idNoticia) return;
+
+		        const commentsList = document.querySelector('.comments-list');
+		        commentsList.innerHTML = '<p class="loading-comments"><i class="fas fa-spinner fa-spin"></i> Cargando comentarios...</p>';
+
+		        fetch(`/comentarios-noticia/${idNoticia}`, {
+		            headers: {
+		                'Accept': 'application/json',
+		                'X-Requested-With': 'XMLHttpRequest'
+		            }
+		        })
+		        .then(response => {
+		            if (!response.ok) {
+		                return response.text().then(text => {
+		                    throw new Error(`Error ${response.status}: ${text}`);
+		                });
+		            }
+		            return response.json();
+		        })
+		        .then(comentarios => {
+		            if (comentarios.length === 0) {
+		                commentsList.innerHTML = '<p class="no-comments">No hay comentarios aún. ¡Sé el primero en comentar!</p>';
+		                return;
+		            }
+		            renderizarComentarios(comentarios);
+		        })
+		        .catch(error => {
+		            console.error('Error al cargar comentarios:', error);
+		            commentsList.innerHTML = `
+		                <p class="error-loading">
+		                    <i class="fas fa-exclamation-triangle"></i> 
+		                    Error al cargar comentarios: ${error.message}
+		                </p>`;
+		        });
+		    }
+
+		    function renderizarComentarios(comentarios) {
+		        const commentsList = document.querySelector('.comments-list');
+		        let html = '';
+
+		        comentarios.forEach(c => {
+		            const fecha = new Date(c.fecha).toLocaleString('es-ES', {
+		                day: '2-digit',
+		                month: '2-digit',
+		                year: 'numeric',
+		                hour: '2-digit',
+		                minute: '2-digit'
+		            });
+		            
+		            const puedeEliminar = c.usuario.id === obtenerIdUsuario() || esAdmin();
+		            
+		            html += `
+		                <div class="comment-item" data-comment-id="${c.id}">
+		                    <div class="comment-header">
+		                        <img src="${c.usuario.foto || '/assets/images/default-avatar.png'}" 
+		                             alt="${c.usuario.nombre}" class="comment-avatar">
+		                        <div class="comment-meta">
+		                            <span class="comment-author">${c.usuario.nombre}</span>
+		                            <span class="comment-date">${fecha}</span>
+		                        </div>
+		                    </div>
+		                    <div class="comment-content">${c.contenido}</div>
+		                    ${puedeEliminar ? `
+		                    <div class="comment-actions">
+		                        <button class="comment-action-btn" onclick="eliminarComentarioNoticia(${c.id}, this)">
+		                            <i class="fas fa-trash"></i> Eliminar
+		                        </button>
+		                    </div>
+		                    ` : ''}
+		                </div>
+		            `;
+		        });
+
+		        commentsList.innerHTML = html;
+		    }
+
+		    function publicarComentarioNoticia() {
+		        const idNoticia = obtenerIdNoticia();
+		        const textarea = document.getElementById('comment-text');
+		        const contenido = textarea.value.trim();
+		        const button = document.getElementById('submit-comment');
+		        
+		        console.log("Intentando publicar comentario para noticia:", idNoticia, contenido);
+		        
+		        if (!contenido) {
+		            showNotification('El comentario no puede estar vacío', 'error');
+		            textarea.focus();
+		            return;
+		        }
+
+		        if (contenido.length > 500) {
+		            showNotification('El comentario no puede exceder los 500 caracteres', 'error');
+		            return;
+		        }
+
+		        const originalText = button.innerHTML;
+		        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publicando...';
+		        button.disabled = true;
+
+		        // Usar la ruta correcta para noticias propias
+		        fetch(`/noticias-propias/${idNoticia}/comentario`, {
+		            method: 'POST',
+		            headers: {
+		                'Content-Type': 'application/json',
+		                'X-CSRF-TOKEN': getCSRFToken()
+		            },
+		            body: JSON.stringify({ contenido: contenido }),
+		            credentials: 'same-origin'
+		        })
+		        .then(response => {
+		            if (!response.ok) {
+		                return response.text().then(text => {
+		                    try {
+		                        // Intentar parsear como JSON si es posible
+		                        const err = JSON.parse(text);
+		                        throw new Error(err.message || err.error || text);
+		                    } catch {
+		                        throw new Error(text);
+		                    }
+		                });
+		            }
+		            return response.json();
+		        })
+		        .then(data => {
+		            showNotification('Comentario publicado exitosamente', 'success');
+		            textarea.value = '';
+		            document.getElementById('char-count').textContent = '0';
+		            cargarComentariosNoticia();
+		        })
+		        .catch(error => {
+		            console.error('Error al publicar comentario:', error);
+		            showNotification(error.message || 'Error al publicar comentario', 'error');
+		        })
+		        .finally(() => {
+		            button.innerHTML = originalText;
+		            button.disabled = false;
+		        });
+		    }
+
+		    function eliminarComentarioNoticia(idComentario, button) {
+		        if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+		            return;
+		        }
+
+		        const originalHtml = button.innerHTML;
+		        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+		        button.disabled = true;
+
+		        fetch(`/comentario-noticia/${idComentario}`, {
+		            method: 'DELETE',
+		            headers: {
+		                'X-Requested-With': 'XMLHttpRequest',
+		                'X-CSRF-TOKEN': getCSRFToken()
+		            },
+		            credentials: 'same-origin'
+		        })
+		        .then(response => {
+		            if (!response.ok) {
+		                return response.json().then(err => { throw err; });
+		            }
+		            return response.json();
+		        })
+		        .then(data => {
+		            if (data.success) {
+		                showNotification('Comentario eliminado', 'success');
+		                button.closest('.comment-item').remove();
+		            } else {
+		                throw new Error(data.message || 'Error al eliminar comentario');
+		            }
+		        })
+		        .catch(error => {
+		            console.error('Error al eliminar comentario:', error);
+		            showNotification(error.message || 'Error al eliminar comentario', 'error');
+		        })
+		        .finally(() => {
+		            button.innerHTML = originalHtml;
+		            button.disabled = false;
+		        });
+		    }
+
+		    function obtenerIdUsuario() {
+		        const token = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+		        if (!token) return null;
+		        
+		        try {
+		            const payload = JSON.parse(atob(token.split('.')[1]));
+		            return parseInt(payload.sub);
+		        } catch (e) {
+		            return null;
+		        }
+		    }
+
+		    function esAdmin() {
+		        const token = document.cookie.split('; ').find(row => row.startsWith('jwt='));
+		        if (!token) return false;
+		        
+		        try {
+		            const payload = JSON.parse(atob(token.split('.')[1]));
+		            return payload.role === 'admin';
+		        } catch (e) {
+		            return false;
+		        }
+		    }
+
+		    function actualizarContador() {
+		        const textarea = document.getElementById('comment-text');
+		        const counter = document.getElementById('char-count');
+		        counter.textContent = textarea.value.length;
+		    }
+
+		    function showNotification(mensaje, tipo) {
+		        const notification = document.createElement('div');
+		        notification.style.position = 'fixed';
+		        notification.style.top = '20px';
+		        notification.style.right = '20px';
+		        notification.style.padding = '15px';
+		        notification.style.borderRadius = '5px';
+		        notification.style.color = 'white';
+		        notification.style.backgroundColor = tipo === 'success' ? '#4CAF50' : '#F44336';
+		        notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+		        notification.style.zIndex = '1000';
+		        notification.style.animation = 'fadeIn 0.3s';
+		        notification.textContent = mensaje;
+		        
+		        document.body.appendChild(notification);
+		        
+		        setTimeout(() => {
+		            notification.style.animation = 'fadeOut 0.3s';
+		            setTimeout(() => notification.remove(), 300);
+		        }, 3000);
+		    }
+
+		    document.addEventListener('DOMContentLoaded', function() {
+		        // Configurar el botón de comentario
+		        const commentButton = document.getElementById('submit-comment');
+		        if (commentButton) {
+		            commentButton.addEventListener('click', publicarComentarioNoticia);
+		        }
+		        
+		        // Configurar el contador de caracteres
+		        const commentTextarea = document.getElementById('comment-text');
+		        if (commentTextarea) {
+		            commentTextarea.addEventListener('input', actualizarContador);
+		            
+		            // Permitir Ctrl+Enter para enviar comentario
+		            commentTextarea.addEventListener('keydown', function(e) {
+		                if (e.ctrlKey && e.key === 'Enter') {
+		                    publicarComentarioNoticia();
+		                }
+		            });
+		        }
+		        
+		        // Cargar comentarios iniciales
+		        cargarComentariosNoticia();
+		    });
+		</script>
+	}

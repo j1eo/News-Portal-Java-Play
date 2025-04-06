@@ -1,0 +1,96 @@
+@(message: String)
+
+@bannerAuth("UR NEWS -- Registro", message) {
+
+    <main>
+        <div class="login-wrapper">
+            <div class="login-form">
+                <h2 class="login-title">INGRESA TUS DATOS</h2>
+
+                <form id="registerForm" action="@routes.AuthController.registrarUsuario()" method="POST">
+                    <div class="form-group">
+                        <input type="text" name="nombre" class="form-control" placeholder="Nombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" name="apellidos" class="form-control" placeholder="Apellidos" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" name="fechanacimiento" id="fechanacimiento" class="form-control" 
+                               onfocus="(this.type='date')" onblur="(this.type='text')" pattern="\d{2}/\d{2}/\d{4}" 
+                               placeholder="Fecha de Nacimiento" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="email" name="email" id="email" class="form-control" placeholder="Email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="email" id="confirmaemail" class="form-control" placeholder="Confirma Email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" name="nickname" class="form-control" placeholder="Usuario" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password" name="password" id="password" class="form-control" 
+                               placeholder="Contraseña" required minlength="8">
+                        <span class="password-hint">Utiliza mínimo 8 caracteres</span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password" id="confpassword" class="form-control" placeholder="Confirma Contraseña" required>
+                    </div>
+
+                    <button type="submit" class="register-btn">REGISTRARSE</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let email = document.getElementById('email').value;
+            let confirmaEmail = document.getElementById('confirmaemail').value;
+            let password = document.getElementById('password').value;
+            let confpassword = document.getElementById('confpassword').value;
+
+            if (email !== confirmaEmail) {
+                alert("Los correos electrónicos no coinciden.");
+                return;
+            }
+
+            if (password !== confpassword) {
+                alert("Las contraseñas no coinciden.");
+                return;
+            }
+
+            this.submit();
+        });
+
+        document.getElementById('fechanacimiento').addEventListener('blur', function() {
+            if(this.value && this.value.includes('-')) {
+                const parts = this.value.split('-');
+                if(parts.length === 3) {
+                    this.value = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+            }
+        });
+
+        document.getElementById('fechanacimiento').addEventListener('focus', function() {
+            if(this.value && this.value.includes('/')) {
+                const parts = this.value.split('/');
+                if(parts.length === 3) {
+                    this.type = 'date';
+                    this.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                }
+            } else {
+                this.type = 'date';
+            }
+        });
+    </script>
+}

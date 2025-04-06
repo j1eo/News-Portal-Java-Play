@@ -1,0 +1,315 @@
+/* Dashboard Layout */
+.user-dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* User Header */
+.user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #1E1E1E;
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.user-greeting {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+}
+
+.user-greeting i {
+    font-size: 1.5rem;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background-color: #DC3545;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+    background-color: #C82333;
+}
+
+/* Main Content Layout */
+.dashboard-main-content {
+    display: flex;
+    gap: 20px
+
+}
+
+/* Modifica la sección del perfil para que sea sticky */
+.profile-section {
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 20px; /* Ajusta este valor según el espacio que quieras desde la parte superior */
+    height: fit-content;
+    align-self: flex-start; /* Esto evita problemas de altura en el contenedor flexible */
+}
+
+/* User Profile Card - Asegúrate de que no tenga márgenes que afecten el sticky */
+.user-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    text-align: center;
+    /* Elimina cualquier margen superior que pueda afectar la posición sticky */
+}
+
+.user-avatar img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #5E36B8;
+}
+
+.user-info h3 {
+    margin: 15px 0 10px;
+    color: #333;
+    font-size: 1.3rem;
+}
+
+.user-info p {
+    margin: 8px 0;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.user-info i {
+    width: 20px;
+    color: #5E36B8;
+}
+
+/* Dashboard Actions */
+.dashboard-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: #5E36B8;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.action-btn:hover {
+    background: #7a52d1;
+    transform: translateY(-2px);
+}
+
+.action-btn i {
+    width: 20px;
+    text-align: center;
+}
+
+/* Articles Sidebar */
+.articles-sidebar {
+    width: 350px;
+    flex-shrink: 0;
+}
+
+.sidebar-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.sidebar-header h2 {
+    font-size: 1.3rem;
+    margin: 0;
+    color: #333;
+}
+
+.btn-filter {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-filter:hover {
+    background-color: #5a6268;
+}
+
+/* Articles List */
+.published-articles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.published-article {
+    background: white;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.published-article:hover {
+    transform: translateY(-2px);
+}
+
+.article-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.article-content {
+    padding: 15px;
+}
+
+.article-content h3 {
+    font-size: 1.1rem;
+    margin: 0 0 10px;
+    color: #2c3e50;
+}
+
+.article-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.article-excerpt {
+    font-size: 0.9rem;
+    color: #34495e;
+    line-height: 1.4;
+    margin-bottom: 12px;
+}
+
+.article-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.read-more {
+    color: #5E36B8;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.read-more:hover {
+    text-decoration: underline;
+}
+
+.article-author {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+/* Empty State */
+.no-articles {
+    text-align: center;
+    padding: 30px 20px;
+    color: #666;
+}
+
+.no-articles i {
+    font-size: 2.5rem;
+    color: #ddd;
+    margin-bottom: 15px;
+}
+
+.no-articles p {
+    margin: 0 0 15px;
+    font-size: 1rem;
+}
+
+.btn-new-article {
+    display: inline-block;
+    padding: 8px 15px;
+    background: #5E36B8;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-new-article:hover {
+    background: #7a52d1;
+    transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .dashboard-main-content {
+        flex-direction: column;
+    }
+    
+    .profile-section, .articles-sidebar {
+        width: 100%;
+    }
+    
+    .articles-sidebar {
+        order: -1;
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .user-card {
+        padding: 15px;
+    }
+    
+    .user-avatar img {
+        width: 100px;
+        height: 100px;
+    }
+}

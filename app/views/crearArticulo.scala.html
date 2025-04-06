@@ -1,0 +1,286 @@
+@(usuario: models.Usuario, message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
+
+@user.userbanner("Crear Nuevo Artículo", message) {
+    <div class="user-dashboard-container">
+        <!-- Barra superior con información de usuario -->
+        @if(usuario != null && usuario.getNombre() != null) {
+            <div class="user-header">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Bienvenido, <strong>@usuario.getNombre()</strong></span>
+                </div>
+                <a href="@routes.AuthController.logout()" class="logout-btn" onclick="return confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </a>
+            </div>
+        } else {
+            <div class="user-header">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Bienvenido, <strong>Invitado</strong></span>
+                </div>
+            </div>
+        }
+
+        <!-- Contenido principal del dashboard -->
+        <div class="dashboard-content">
+            <div class="form-container">
+                <!-- Ruta de navegación -->
+                <div class="news-breadcrumb">
+                    <a href="@routes.UserController.dashboard()">Dashboard</a> > 
+                    <a href="@routes.ArticulosController.listarArticulos()">Artículos</a> >
+                    <span>Nuevo Artículo</span>
+                </div>
+
+                <!-- Título del formulario -->
+                <div class="form-header">
+                    <h1><i class="fas fa-file-alt"></i> Crear Nuevo Artículo</h1>
+                </div>
+
+                <!-- Formulario -->
+                <form id="form-crear-articulo" class="article-form" action="@routes.ArticulosController.crearArticulo()" method="POST">
+                    @if(usuario != null) {
+                        <input type="hidden" name="autor" value="@usuario.getNombre()">
+                    }
+                    
+                    <div class="form-group">
+                        <label for="titulo">Título *</label>
+                        <input type="text" id="titulo" name="titulo" required class="form-control" placeholder="Ej: Las últimas tendencias en tecnología">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contenido">Contenido *</label>
+                        <textarea id="contenido" name="contenido" required class="form-control" rows="10" placeholder="Escribe aquí el contenido de tu artículo..."></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="categoria">Categoría *</label>
+                            <select id="categoria" name="categoria" class="form-control" required>
+                                <option value="">Seleccione una categoría</option>
+                                <option value="TECNOLOGIA">Tecnología</option>
+                                <option value="CIENCIA">Ciencia</option>
+                                <option value="CULTURA">Cultura</option>
+                                <option value="DEPORTES">Deportes</option>
+                                <option value="POLITICA">Política</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col-md-6">
+                            <label for="estado">Estado *</label>
+                            <select id="estado" name="estado" class="form-control" required>
+                                <option value="BORRADOR">Borrador</option>
+                                <option value="PUBLICADO">Publicado</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="imagen">URL de la Imagen (opcional)</label>
+                        <input type="url" id="imagen" name="imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
+                        <small class="text-muted">Usa una imagen con relación de aspecto 16:9 para mejores resultados</small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="action-btn">
+                            <i class="fas fa-paper-plane"></i> Publicar Artículo
+                        </button>
+                        <a href="@routes.ArticulosController.listarArticulos()" class="cancel-btn">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+	<style>
+	    .form-container {
+	        max-width: 800px;
+	        margin: 20px auto;
+	        padding: 30px;
+	        background: white;
+	        border-radius: 10px;
+	        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+	        border: 1px solid #eaeaea;
+	    }
+
+	    .news-breadcrumb {
+	        margin-bottom: 25px;
+	        font-size: 0.9em;
+	        color: var(--primary-color);
+	        padding-bottom: 12px;
+	        border-bottom: 1px solid #f0f0f0;
+	    }
+
+	    .news-breadcrumb a {
+	        color: var(--accent-color);
+	        text-decoration: none;
+	        transition: color 0.2s;
+	    }
+
+	    .news-breadcrumb a:hover {
+	        color: #7a52d1;
+	        text-decoration: underline;
+	    }
+
+	    .form-header {
+	        margin-bottom: 30px;
+	    }
+
+	    .form-header h1 {
+	        font-size: 1.8em;
+	        color: var(--primary-color);
+	        display: flex;
+	        align-items: center;
+	        gap: 10px;
+	    }
+
+	    .form-header h1 i {
+	        color: var(--accent-color);
+	    }
+
+	    .article-form {
+	        background: #fff;
+	    }
+
+	    .form-group {
+	        margin-bottom: 20px;
+	    }
+
+	    .form-group label {
+	        display: block;
+	        margin-bottom: 8px;
+	        font-weight: 600;
+	        color: var(--primary-color);
+	    }
+
+	    .form-control {
+	        width: 100%;
+	        padding: 12px 15px;
+	        border: 1px solid #ddd;
+	        border-radius: 6px;
+	        font-size: 1em;
+	        transition: all 0.3s;
+	        background-color: #f9f9f9;
+	        color: var(--primary-color);
+	    }
+
+	    .form-control::placeholder {
+	        color: var(--primary-color);
+	        opacity: 0.7;
+	    }
+
+	    .form-control:focus {
+	        border-color: var(--accent-color);
+	        outline: none;
+	        box-shadow: 0 0 0 3px rgba(94, 54, 184, 0.1);
+	        background-color: #fff;
+	    }
+
+	    textarea.form-control {
+	        min-height: 250px;
+	        resize: vertical;
+	    }
+
+	    .form-row {
+	        display: flex;
+	        gap: 20px;
+	    }
+
+	    .form-row .form-group {
+	        flex: 1;
+	    }
+
+	    .form-actions {
+	        display: flex;
+	        align-items: center;
+	        gap: 15px;
+	        margin-top: 30px;
+	    }
+
+	    .action-btn, .cancel-btn {
+	        display: inline-flex;
+	        align-items: center;
+	        justify-content: center;
+	        gap: 8px;
+	        padding: 12px 24px;
+	        font-size: 1em;
+	        font-weight: 600;
+	        border-radius: 6px;
+	        cursor: pointer;
+	        transition: all 0.3s ease;
+	        font-family: 'Inter', sans-serif;
+	        text-decoration: none;
+	        border: 2px solid transparent;
+	        height: 44px;
+	        box-sizing: border-box;
+	    }
+
+	    .action-btn {
+	        background-color: var(--accent-color);
+	        color: white;
+	        border-color: var(--accent-color);
+	    }
+
+	    .action-btn:hover,
+	    .cancel-btn:hover {
+	        transform: translateY(-2px);
+	        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	    }
+
+	    .action-btn:hover {
+	        background-color: #7a52d1;
+	        border-color: #7a52d1;
+	    }
+
+	    .action-btn:active {
+	        background-color: var(--primary-hover);
+	        transform: scale(0.95);
+	    }
+
+	    .cancel-btn {
+	        background-color: white;
+	        color: var(--accent-color);
+	        border-color: var(--accent-color);
+	    }
+
+	    .cancel-btn:hover {
+	        background-color: #f8f5ff;
+	        color: #7a52d1;
+	        border-color: #7a52d1;
+	    }
+
+	    .action-btn:active,
+	    .cancel-btn:active {
+	        transform: translateY(0);
+	        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+	    }
+
+	    .text-muted {
+	        color: var(--primary-color);
+	        opacity: 0.7;
+	        font-size: 0.85em;
+	        display: block;
+	        margin-top: 5px;
+	    }
+	</style>
+
+
+    <script>
+        // Validación básica del formulario
+        document.getElementById('form-crear-articulo').addEventListener('submit', function(e) {
+            const titulo = document.getElementById('titulo').value.trim();
+            const contenido = document.getElementById('contenido').value.trim();
+            
+            if (!titulo || !contenido) {
+                e.preventDefault();
+                alert('Por favor complete todos los campos requeridos');
+            }
+        });
+
+        function confirmLogout() {
+            return confirm("¿Estás seguro que deseas cerrar sesión?");
+        }
+    </script>
+}

@@ -1,13 +1,88 @@
-# Definición de rutas para el portal de noticias
-GET     /       controllers.HomeController.index()
+# Home
+GET     /                       controllers.HomeController.index()
 
+# Authentication
+GET     /login                  controllers.AuthController.login()
+POST    /login                  controllers.AuthController.autenticar()
+GET     /register               controllers.AuthController.register()
+POST    /auth/registrar         controllers.AuthController.registrarUsuario()
+GET     /auth/crearUsuarioPrueba controllers.AuthController.crearUsuarioPrueba()
+GET     /logout                 controllers.AuthController.logout()
 
-# Obtener noticias externas
-GET     /noticias              controllers.NoticiasController.obtenerNoticias
+# User routes
+GET     /user                   controllers.UserController.dashboard()
+GET     /user/dashboard         controllers.UserController.dashboard()
+GET     /user/perfil            controllers.UserController.miPerfil()
+# Edición de perfil de usuario
+GET     /user/perfil/editar      controllers.UserController.mostrarFormularioEdicion()
+POST    /user/perfil/actualizar  controllers.UserController.actualizarPerfil()
 
+# Admin routes
+GET     /admin                  controllers.AdminController.dashboard()
+GET     /admin/dashboard        controllers.AdminController.dashboard()
+GET     /admin/usuarios         controllers.AdminController.gestionarUsuarios()
 
+# Nueva ruta para obtener usuario
+GET     /admin/usuario/:id      controllers.AdminController.obtenerUsuario(id: Long)
 
-GET     /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)
+PUT     /admin/usuario/:id      controllers.AdminController.actualizarUsuario(id: Long)
+DELETE  /admin/usuario/:id      controllers.AdminController.eliminarUsuario(id: Long)
+PUT     /admin/articulo/:id/estado controllers.AdminController.cambiarEstadoArticulo(id: Long, estado: String)
+# Admin Articles Management
+GET     /admin/articulos                  controllers.AdminController.gestionarArticulos()
+GET     /admin/articulo/:id               controllers.AdminController.obtenerArticulo(id: Long)
+POST    /admin/articulo                   controllers.AdminController.crearArticulo()
+PUT     /admin/articulo/:id               controllers.AdminController.actualizarArticulo(id: Long)
+DELETE  /admin/articulo/:id               controllers.AdminController.eliminarArticulo(id: Long)
 
-GET     /articulos          controllers.ArticulosController.obtenerArticulos
-POST    /articulos          controllers.ArticulosController.agregarArticulo
+# Admin News Management
+GET     /admin/noticias                  controllers.AdminController.gestionarNoticias()
+GET     /admin/noticia/:id               controllers.AdminController.obtenerNoticia(id: Long)
+POST    /admin/noticia                   controllers.AdminController.crearNoticia()
+PUT     /admin/noticia/:id               controllers.AdminController.actualizarNoticia(id: Long)
+DELETE  /admin/noticia/:id               controllers.AdminController.eliminarNoticia(id: Long)
+
+# News & Articles
+GET     /noticias/milenio          controllers.NoticiasController.obtenerNoticiasMilenio()
+GET     /noticias/elpais           controllers.NoticiasController.obtenerNoticiasElPais()
+GET     /noticias/todas            controllers.NoticiasController.obtenerNoticias()
+GET     /articulos              controllers.ArticulosController.listarArticulos()
+POST    /articulos              controllers.ArticulosController.crearArticulo()
+GET     /articulo/:id           controllers.ArticulosController.mostrarArticulo(id: Integer)
+GET     /articulos/nuevo        controllers.ArticulosController.mostrarFormularioCreacion()
+DELETE  /articulo/:id           controllers.ArticulosController.eliminarArticulo(id: Integer)
+
+# Likes para artículos
+POST    /articulo/:id/like               controllers.ArticulosController.darLike(id: Int)
+POST    /articulo/:id/no-me-gusta        controllers.ArticulosController.darNoMeGusta(id: Int)
+
+# Comentarios
+GET     /comentarios/:idArticulo      controllers.ComentariosController.obtenerComentarios(idArticulo: Integer)
+POST    /articulo/:id/comentario      controllers.ComentariosController.agregarComentario(id: Integer)
+DELETE  /comentario/:id               controllers.ComentariosController.eliminarComentario(id: Integer)
+
+# Comentarios para noticias
+GET     /comentarios-noticia/:id          controllers.ComentariosController.obtenerComentariosNoticia(id: Integer)
+POST    /noticias-propias/:id/comentario  controllers.ComentariosController.agregarComentarioNoticia(id: Integer)
+DELETE  /comentario-noticia/:id           controllers.ComentariosController.eliminarComentarioNoticia(id: Integer)
+
+# Noticias Propias
+GET     /noticias-propias/crear                 controllers.NoticiasPropiasController.mostrarFormularioCreacion()
+GET     /noticias-propias                       controllers.NoticiasPropiasController.listarNoticias()
+POST    /noticias-propias                       controllers.NoticiasPropiasController.crearNoticia()
+GET     /noticias-propias/:id                   controllers.NoticiasPropiasController.mostrarNoticia(id: Integer)
+DELETE  /noticias-propias/:id                   controllers.NoticiasPropiasController.eliminarNoticia(id: Integer)
+
+POST    /noticias-propias/:id/like              controllers.NoticiasPropiasController.darLikeNoticiaPropia(id: Int)
+POST    /noticias-propias/:id/dislike           controllers.NoticiasPropiasController.darNoMeGustaNoticiaPropia(id: Int)
+
+# Suscripciones
+GET     /user/suscripcion         controllers.UserController.mostrarFormularioSuscripcion()
+POST    /user/suscripcion         controllers.UserController.actualizarSuscripcion()
+
+# Assets
+GET     /assets/*file           controllers.Assets.versioned(path="/public", file: Asset)
+GET     /api/check-role      controllers.NoticiasPropiasController.verificarRol()
+
+# Search functionality
+GET     /search                  controllers.SearchController.search(q: String)

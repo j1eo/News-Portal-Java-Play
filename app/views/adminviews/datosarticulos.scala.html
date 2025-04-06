@@ -1,0 +1,336 @@
+@(articulos: List[models.Articulo], message: String)(implicit request: play.mvc.Http.Request)
+
+@adminbanner("Gestión de Artículos", message) {
+<div class="article-management-container">
+	
+    <div >
+        <h1 class="title-section">GESTION DE ARTICULOS</h1>
+        <div class="d-flex justify-content-center">
+            <a href="@routes.AdminController.dashboard()" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="articles-grid">
+        @for(articulo <- articulos) {
+        <div class="article-card">
+            <div class="article-card-header">
+                <span class="article-card-id">ID: @articulo.getIdArticulo()</span>
+                <h3 class="article-card-title">@articulo.getTitulo()</h3>
+            </div>
+            <div class="article-card-body">
+                <div class="article-detail">
+                    <span class="article-detail-label">Autor:</span>
+                    <span class="article-detail-value">@articulo.getAutor()</span>
+                </div>
+                <div class="article-detail">
+                    <span class="article-detail-label">Estado:</span>
+                    <span class="article-detail-value @articulo.getEstado().toLowerCase()">
+                        @articulo.getEstado()
+                    </span>
+                </div>
+                @if(articulo.getImagen() != null && !articulo.getImagen().isEmpty()) {
+                <div class="article-image-preview">
+                    <img src="@articulo.getImagen()" alt="Imagen del artículo" class="img-thumbnail">
+                </div>
+                }
+            </div>
+            <div class="article-card-footer justify-content-center">
+                <button class="article-action-btn edit-btn edit-article" 
+                        data-id="@articulo.getIdArticulo()">
+                    <i class="fas fa-edit"></i> Editar
+                </button>
+                <button class="article-action-btn delete-btn delete-article" 
+                        data-id="@articulo.getIdArticulo()">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+
+<!-- Tarjeta de Edición -->
+<div class="edit-card-container" id="editArticleContainer">
+    <div class="edit-card">
+        <div class="edit-card-header text-center">
+            <h4><i class="fas fa-file-alt mr-2"></i>Editar Artículo</h4>
+            <button class="close-edit-card"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="editArticleForm" method="POST">
+            <div class="edit-card-body">
+                <input type="hidden" id="editArticleId" name="id">
+                <div class="form-group text-center">
+                    <label for="editTitulo">Título</label>
+                    <input type="text" class="form-control mx-auto" id="editTitulo" name="titulo" required>
+                </div>
+                <div class="form-group text-center">
+                    <label for="editAutor">Autor</label>
+                    <input type="text" class="form-control mx-auto" id="editAutor" name="autor" required>
+                </div>
+                <div class="form-group text-center">
+                    <label for="editContenido">Contenido</label>
+                    <textarea class="form-control mx-auto" id="editContenido" name="contenido" rows="6" required></textarea>
+                </div>
+                <div class="form-group text-center">
+                    <label for="editEstado">Estado</label>
+                    <select class="form-control mx-auto" id="editEstado" name="estado" required>
+                        <option value="PUBLICADO">Publicado</option>
+                        <option value="BORRADOR">Borrador</option>
+                    </select>
+                </div>
+            </div>
+            <div class="edit-card-footer justify-content-center">
+                <button type="button" class="btn btn-outline-secondary cancel-edit">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Estilos base */
+    .article-management-container {
+        padding: 2rem;
+        background-color: #f8f9fa;
+    }
+
+    .article-header {
+        margin-bottom: 2rem;
+    }
+    
+    .article-title {
+        font-size: 2rem;
+        margin: 0 auto 1rem;
+        text-align: center;
+    }
+
+    /* Grid de artículos */
+    .articles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    /* Tarjetas de artículo */
+    .article-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .article-card-header {
+        background-color: #343a40;
+        color: white;
+        padding: 1rem;
+        position: relative;
+    }
+
+    .article-card-id {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(255,255,255,0.2);
+        padding: 0.25rem 0.5rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+
+    .article-card-title {
+        font-size: 1.25rem;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .article-card-body {
+        padding: 1.5rem;
+    }
+
+    .article-detail {
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .article-detail-label {
+        font-weight: 600;
+    }
+
+    .article-image-preview {
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .article-image-preview img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+
+    .publicado {
+        color: #28a745;
+    }
+
+    .borrador {
+        color: #ffc107;
+    }
+
+    .article-card-footer {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .article-action-btn {
+        border: none;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .edit-btn {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .delete-btn {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    /* Tarjeta de edición */
+    .edit-card-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1050;
+    }
+
+    .edit-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .edit-card-header {
+        background-color: #343a40;
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .close-edit-card {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .edit-card-body {
+        padding: 1.5rem;
+    }
+
+    .edit-card-footer {
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+
+    
+</style>
+
+<script>
+$(document).ready(function() {
+    // Mostrar formulario de edición
+    $('.edit-article').click(function() {
+        var articleId = $(this).data('id');
+        $.get('/admin/articulo/' + articleId, function(data) {
+            $('#editArticleId').val(data.idArticulo);
+            $('#editTitulo').val(data.titulo);
+            $('#editAutor').val(data.autor);
+            $('#editContenido').val(data.contenido);
+            $('#editEstado').val(data.estado);
+            
+            $('#editArticleContainer').show();
+        });
+    });
+
+    // Ocultar formulario
+    $('.close-edit-card, .cancel-edit').click(function() {
+        $('#editArticleContainer').hide();
+    });
+
+    // Enviar formulario
+    $('#editArticleForm').submit(function(e) {
+        e.preventDefault();
+        var articleId = $('#editArticleId').val();
+        var formData = $(this).serialize();
+        
+        var method = articleId ? 'PUT' : 'POST';
+        var url = articleId ? '/admin/articulo/' + articleId : '/admin/articulo';
+        
+        $.ajax({
+            url: url,
+            type: method,
+            data: formData,
+            success: function() {
+                $('#editArticleContainer').hide();
+                location.reload();
+            },
+            error: function() {
+                alert('Error al guardar el artículo');
+            }
+        });
+    });
+
+    // Eliminar artículo
+    $('.delete-article').click(function() {
+        if (confirm('¿Estás seguro de eliminar este artículo?')) {
+            var articleId = $(this).data('id');
+            $.ajax({
+                url: '/admin/articulo/' + articleId,
+                type: 'DELETE',
+                success: function() {
+                    location.reload();
+                },
+                error: function() {
+                    alert('Error al eliminar el artículo');
+                }
+            });
+        }
+    });
+});
+</script>
+}

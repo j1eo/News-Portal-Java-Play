@@ -1,0 +1,458 @@
+@(currentAdmin: models.Admin, stats: Map[String, Integer], message: String)(implicit request: play.mvc.Http.Request)
+
+@adminbanner("Panel de Administración", message) {
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <nav class="admin-sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+					<a href=@routes.AdminController.dashboard() class="fas fa-newspaper">
+                    </a>
+                </div>
+                <h1>UR NEWS</h1>
+                <p>Panel de Administración</p>
+            </div>
+            
+            <div class="sidebar-user">
+                <div class="user-info">
+                    <span class="user-name">@currentAdmin.getNombre() @currentAdmin.getApellidos()</span>
+                    <span class="user-role">Administrador</span>
+                </div>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="active">
+                    <a href="@routes.AdminController.dashboard()">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="@routes.AdminController.gestionarUsuarios()">
+                        <i class="fas fa-users"></i>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="@routes.AdminController.gestionarArticulos()">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Artículos</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="@routes.AdminController.gestionarNoticias()">
+                        <i class="fas fa-bell"></i>
+                        <span>Noticias</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="@routes.AuthController.logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-content">
+            <header class="content-header">
+                <h2>Resumen General</h2>
+               
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card users">
+                    <div class="stat-info">
+                        <h3>Usuarios</h3>
+                        <h1>@stats.getOrDefault("usuarios", 0)</h1>
+                        <a href="@routes.AdminController.gestionarUsuarios()" class="stat-link">Ver todos <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card articles">
+                    <div class="stat-info">
+                        <h3>Artículos</h3>
+                        <h1>@stats.getOrDefault("articulos", 0)</h1>
+                        <a href="@routes.AdminController.gestionarArticulos()" class="stat-link">Ver todos <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                </div>
+                
+                <div class="stat-card news">
+                    <div class="stat-info">
+                        <h3>Noticias</h3>
+                        <h1>@stats.getOrDefault("noticias", 0)</h1>
+                        <a href="@routes.AdminController.gestionarNoticias()" class="stat-link">Ver todos <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="stat-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                </div>
+                
+               
+            </div>
+
+            <!-- Recent Activity Section -->
+            <section style="visibility: hidden;">
+                <h3>Actividad Reciente</h3>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p>Nuevo usuario registrado: Juan Pérez</p>
+                            <span class="activity-time">Hace 15 minutos</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-file-upload"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p>Artículo "Nuevas tecnologías 2023" publicado</p>
+                            <span class="activity-time">Hace 2 horas</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="activity-details">
+                            <p>5 nuevos comentarios en noticias</p>
+                            <span class="activity-time">Hace 4 horas</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- CSS específico para admin -->
+    <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f7fa;
+        }
+        
+        /* Sidebar Styles */
+        .admin-sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-brand {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        
+        .brand-logo {
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-brand h1 {
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .sidebar-brand p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1rem;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .user-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 1.5rem 0;
+            flex-grow: 1;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-menu li a i {
+            margin-right: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .sidebar-menu li a:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .sidebar-menu li.active a {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border-left: 3px solid white;
+        }
+        
+        /* Main Content Styles */
+        .admin-content {
+            flex-grow: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .content-header h2 {
+            color: var(--dark-color);
+            font-size: 1.75rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-bell {
+            position: relative;
+            margin-left: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-color);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: bold;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-info h3 {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-info h1 {
+            color: var(--dark-color);
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .stat-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .stat-link i {
+            margin-left: 0.5rem;
+            font-size: 0.7rem;
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            opacity: 0.2;
+            color: var(--dark-color);
+        }
+        
+        /* Specific card colors */
+        .stat-card.users {
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .stat-card.users .stat-icon {
+            color: var(--primary-color);
+        }
+        
+        .stat-card.articles {
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .stat-card.articles .stat-icon {
+            color: var(--accent-color);
+        }
+        
+        .stat-card.news {
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .stat-card.news .stat-icon {
+            color: var(--success-color);
+        }
+        
+        .stat-card.activity {
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .stat-card.activity .stat-icon {
+            color: var(--warning-color);
+        }
+        
+        .stat-subtext {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        
+        /* Recent Activity */
+        .recent-activity {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+        .recent-activity h3 {
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+        }
+        
+        .activity-list {
+            list-style: none;
+        }
+        
+        .activity-item {
+            display: flex;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .activity-details p {
+            color: var(--dark-color);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+    </style>
+}

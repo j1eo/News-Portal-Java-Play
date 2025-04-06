@@ -1,24 +1,128 @@
-@*
- * This template is called from the `index` template. This template
- * handles the rendering of the page header and body tags. It takes
- * two arguments, a `String` for the title of the page and an `Html`
- * object to insert into the body of the page.
- *@
-@(title: String)(content: Html)
+@(title: String, message: String)(content: Html)
 
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        @* Here's where we render the page title `String`. *@
         <title>@title</title>
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
-		<link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/noticias.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/noticias.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/seccion-articulos.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/dashboard.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/LOGO.png")">
-        <script src="@routes.Assets.versioned("javascripts/hello.js")" type="text/javascript"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     </head>
-    <body>
-        @* And here's where we render the `Html` object containing
-         * the page content. *@
+    <body data-assets-path="@routes.Assets.versioned("")">
+        <!-- Header reutilizable -->
+        <header>
+            <div class="container">
+                <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
+                <a href="@routes.HomeController.index()" class="logo-link">
+                    <div class="logo">
+                        <img src="/assets/images/LOGO.png" alt="Logo">
+                        <h1>@message</h1>
+                    </div>
+                </a> 
+                <div class="buttons">
+                    <button onclick="window.location.href='@routes.AuthController.login()'" class="btn btn-primary">INICIAR SESIÓN</button>
+                    <button onclick="window.location.href='@routes.AuthController.login()'" class="btn btn-secondary">SUSCRÍBETE</button>
+                </div>
+            </div>
+        </header>
+		<nav class="nav-bar">    
+				            <button class="nav-button" onclick="window.location.href='@routes.UserController.dashboard()'">TODAS LAS NOTICIAS </button>
+				            <button class="nav-button" onclick="window.location.href='@routes.NoticiasPropiasController.listarNoticias()'">NUESTRAS NOTICIAS</button>
+				            <button class="nav-button" onclick="window.location.href='@routes.ArticulosController.listarArticulos()'">ARTÍCULOS</button>
+				            <button class="nav-button" onclick="window.open('https://www.milenio.com', '_blank');">MILENIO</button>
+				            <button class="nav-button" onclick="window.open('https://elpais.com/mexico/', '_blank');">EL PAÍS</button>
+				        </nav>
+        
+        <!-- Sidenav con diseño mejorado -->
+        <div id="mySidenav" class="sidenav">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <div class="sidenav-header">
+                <p>Descubre las últimas noticias</p>
+            </div>
+            
+            <div class="search-container">
+                <form action="@routes.SearchController.search("")" method="GET" style="display: contents;">
+                    <input type="text" 
+                           name="q" 
+                           class="search-bar" 
+                           placeholder="Buscar..." 
+                           required
+                           onkeypress="handleKeyPress(event)">
+                    <!-- Botón oculto pero necesario para el submit -->
+                    <button type="submit" style="display: none;"></button>
+                </form>
+            </div>
+            
+            <div class="sidenav-links">
+                <a href="#"><i class="fas fa-map-marker-alt"></i> Noticias Locales</a>
+                <a href="#"><i class="fas fa-globe-americas"></i> Noticias Nacionales</a>
+                <a href="@routes.ArticulosController.listarArticulos()"><i class="fas fa-file-alt"></i> Artículos</a>
+                <a href="#"><i class="fas fa-question-circle"></i> Preguntas Frecuentes</a>
+            </div>
+        </div>
+        
+        <!-- Overlay para cerrar el sidenav -->
+        <div id="overlay" class="overlay" onclick="closeNav()"></div>
+
+        <!-- Contenido dinámico de la página -->
         @content
+        
+        <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
+        <script>
+            // Función para manejar la búsqueda con Enter
+            function handleKeyPress(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    const searchTerm = event.target.value.trim();
+                    if (searchTerm.length >= 2) {
+                        event.target.form.submit();
+                    } else {
+                        alert('Por favor ingresa al menos 2 caracteres para buscar');
+                    }
+                }
+            }
+
+            // Funciones para abrir/cerrar el sidenav
+            function openNav() {
+                document.getElementById("mySidenav").style.width = "450px";
+                document.getElementById("overlay").style.display = "block";
+                document.querySelector('.search-bar').focus();
+            }
+
+            function closeNav() {
+                document.getElementById("mySidenav").style.width = "0";
+                document.getElementById("overlay").style.display = "none";
+            }
+
+            // Validación al enviar el formulario
+            document.querySelector('.search-container form')?.addEventListener('submit', function(e) {
+                const searchTerm = this.querySelector('input[name="q"]').value.trim();
+                if (searchTerm.length < 2) {
+                    e.preventDefault();
+                    alert('Por favor ingresa al menos 2 caracteres para buscar');
+                }
+            });
+        </script>
+		<style>
+			.logo-link .logo img {
+			                transition: transform 0.3s ease; /* Suaviza la transición */
+			            }
+			            
+			            .logo-link:hover .logo img {
+			                transform: scale(1.1); /* Aumenta el tamaño en un 10% */
+			            }
+			            
+			            /* Opcional: efecto para el texto también */
+			            .logo-link .logo h1 {
+			                transition: transform 0.3s ease;
+			            }
+			            
+			            .logo-link:hover .logo h1 {
+			                transform: scale(1.05);
+			            }
+		</style>
     </body>
 </html>

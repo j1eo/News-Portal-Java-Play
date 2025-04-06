@@ -1,0 +1,212 @@
+@(usuario: models.Usuario, 
+articulosPublicados: List[models.Articulo],
+noticiaPrincipal: models.NoticiaPropia,
+  noticiasSecundarias: List[models.NoticiaPropia], 
+message: String = "UR NEWS")(implicit request: play.mvc.Http.Request)
+
+@userbanner("Panel de Usuario", message) {
+	<div id="overlay">
+				</div>
+    
+    <main class="dashboard-main">
+        <div class="user-dashboard-container">
+            <!-- Barra superior con información de usuario -->
+            <div class="user-header">
+                <div class="user-greeting">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Bienvenido, <strong>@usuario.getNombre()</strong></span>
+                </div>
+                <a href="@routes.AuthController.logout()" class="logout-btn" onclick="return confirmLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </a>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="dashboard-main-content">
+                <!-- Sección de perfil -->
+                <div class="profile-section">
+                    <div class="user-card">
+                        <div class="user-avatar">
+							<img src="@usuario.getFotoPerfil()" alt="Avatar" 
+							        onerror="this.src='@routes.Assets.versioned("images/favicon.png")'">
+                        </div>
+                        <div class="user-info">
+                            <h3>@usuario.getNombre() @usuario.getApellidos()</h3>
+                            <p><i class="fas fa-envelope"></i> @usuario.getEmail()</p>
+                            <p><i class="fas fa-star"></i> Suscripción: @usuario.getSuscripcion()</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-actions">
+						<a href="@routes.UserController.mostrarFormularioEdicion()" class="action-btn">
+						    <i class="fas fa-user-edit"></i> Editar perfil
+						</a>
+                        <a href="@routes.NoticiasPropiasController.listarNoticias()" class="action-btn">
+                            <i class="fas fa-newspaper"></i> Ver noticias
+                        </a>
+                        <a href="@routes.ArticulosController.listarArticulos()" class="action-btn">
+                            <i class="fas fa-book"></i> Ver Artículos
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sección central de contenido -->
+                <div class="content-section">
+                    <!-- Noticias Destacadas -->
+					<section class="main-news">
+					                        @if(noticiaPrincipal != null) {
+					                            <img src="@noticiaPrincipal.getImagen()" alt="@noticiaPrincipal.getTitulo()" 
+					                                 onerror="this.src='@routes.Assets.versioned("images/imagenplaceholder.png")'">
+					                            <div class="main-news-text">
+					                                <h1>@noticiaPrincipal.getTitulo()</h1>
+					                                <p>@noticiaPrincipal.getDescripcion()</p>
+					                                <a href="@routes.NoticiasPropiasController.mostrarNoticia(noticiaPrincipal.getIdNoticia())" target="_blank">Leer más</a>
+					                            </div>
+					                        } else {
+					                            <!-- Contenido por defecto si no hay noticias -->
+					                            <img src="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Título de la noticia">
+					                            <div class="main-news-text">
+					                                <h1>Título de la Noticia Principal</h1>
+					                                <p>Breve descripción de la noticia principal.</p>
+					                                <a href="#" target="_blank">Leer más</a>
+					                            </div>
+					                        }
+					                    </section>
+
+										<!-- Noticias Secundarias -->
+										                    <section class="secondary-news">
+										                        <div class="title-section">
+										                            <h2>Otras Noticias</h2>
+										                        </div>
+										                        <div class="secondary-news-container">
+										                            @if(!noticiasSecundarias.isEmpty()) {
+										                                @for((noticia, index) <- noticiasSecundarias.zipWithIndex) {
+										                                    <div id="noticia-secundaria-@(index+1)" class="secondary-news-item">
+										                                        <img src="@noticia.getImagen()" alt="@noticia.getTitulo()" 
+										                                             onerror="this.src='@routes.Assets.versioned("images/imagenplaceholder.png")'">
+										                                        <h2>@noticia.getTitulo()</h2>
+										                                        <p>@noticia.getDescripcion()</p>
+										                                        <a href="@routes.NoticiasPropiasController.mostrarNoticia(noticia.getIdNoticia())" target="_blank">Leer más</a>
+										                                    </div>
+										                                }
+										                            } else {
+										                                <!-- Contenido por defecto si no hay noticias secundarias -->
+										                                <div id="noticia-secundaria-1" class="secondary-news-item">
+										                                    <img src="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Noticia secundaria 1">
+										                                    <h2>Título Noticia Secundaria 1</h2>
+										                                    <p>Descripción breve de la noticia secundaria 1</p>
+										                                    <a href="#" target="_blank">Leer más</a>
+										                                </div>
+										                                <div id="noticia-secundaria-2" class="secondary-news-item">
+										                                    <img src="@routes.Assets.versioned("images/imagenplaceholder.png")" alt="Noticia secundaria 2">
+										                                    <h2>Título Noticia Secundaria 2</h2>
+										                                    <p>Descripción breve de la noticia secundaria 2</p>
+										                                    <a href="#" target="_blank">Leer más</a>
+										                                </div>
+										                            }
+										                        </div>
+										                    </section>
+
+															<!-- Más Noticias -->
+															                    <section class="more-news">
+															                        <div class="title-section">
+															                            <h2>Noticias de MILENIO</h2>
+															                        </div>
+															                        <div id="noticias-lista-milenio" class="news-grid"></div>
+															                    </section>
+
+															                    <section class="more-news">
+															                        <div class="title-section">
+															                            <h2>Noticias de EL PAIS</h2>
+															                        </div>
+															                        <div id="noticias-lista-elpais" class="news-grid"></div>
+															                    </section>
+															            
+                </div>
+
+                <!-- Sidebar de artículos -->
+                <aside class="articles-sidebar">
+                    <section class="sidebar-section">
+                        <div class="sidebar-header">
+                            <h2>Artículos Publicados</h2>
+                            <button class="btn-filter" id="filter-articles">
+                                <i class="fas fa-filter"></i> Filtrar
+                            </button>
+                        </div>
+                        <div class="published-articles-list">
+                            @for(articulo <- articulosPublicados) {
+                                <article class="published-article" data-author-id="@articulo.getIdUsuario()">
+                                    @if(articulo.getImagen() != null && !articulo.getImagen().isEmpty()) {
+                                        <img src="@articulo.getImagen()" alt="@articulo.getTitulo()" class="article-image">
+                                    } else {
+                                        <img src="@routes.Assets.versioned("images/article-placeholder.jpg")" alt="Imagen predeterminada" class="article-image">
+                                    }
+                                    <div class="article-content">
+                                        <h3>@articulo.getTitulo()</h3>
+                                        <div class="article-meta">
+                                            <span class="article-category">@articulo.getCategoria()</span>
+                                            <span class="article-date">@articulo.getFechaPublicacion().format("dd MMM yyyy")</span>
+                                        </div>
+                                        <p class="article-excerpt">
+                                            @if(articulo.getContenido().length() > 100) {
+                                                @articulo.getContenido().substring(0, 100)...
+                                            } else {
+                                                @articulo.getContenido()
+                                            }
+                                        </p>
+                                        <div class="article-footer">
+                                            <a href="@routes.ArticulosController.mostrarArticulo(articulo.getIdArticulo())" class="read-more">Leer más</a>
+                                            <span class="article-author">@articulo.getAutor()</span>
+                                        </div>
+                                    </div>
+                                </article>
+                            }
+                            @if(articulosPublicados.isEmpty()) {
+                                <div class="no-articles">
+                                    <i class="fas fa-newspaper"></i>
+                                    <p>No hay artículos publicados aún</p>
+                                    <a href="@routes.ArticulosController.mostrarFormularioCreacion()" class="btn-new-article">
+                                        <i class="fas fa-plus"></i> Crear primer artículo
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </section>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
+    <script>
+    function confirmLogout() {
+        return confirm("¿Estás seguro que deseas cerrar sesión?");
+    }
+
+    // Filtrado de artículos
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterBtn = document.getElementById('filter-articles');
+        if (filterBtn) {
+            const articles = document.querySelectorAll('.published-article');
+            const currentUserId = @usuario.getIdUsuario();
+            let showingAll = true;
+
+            filterBtn.addEventListener('click', function() {
+                showingAll = !showingAll;
+                
+                articles.forEach(article => {
+                    const authorId = parseInt(article.getAttribute('data-author-id'));
+                    
+                    if (showingAll) {
+                        article.style.display = 'block';
+                        filterBtn.innerHTML = '<i class="fas fa-filter"></i> Mostrar solo míos';
+                    } else {
+                        article.style.display = authorId === currentUserId ? 'block' : 'none';
+                        filterBtn.innerHTML = '<i class="fas fa-filter"></i> Mostrar todos';
+                    }
+                });
+            });
+        }
+    });
+    </script>
+}

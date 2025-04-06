@@ -2,34 +2,43 @@ package models;
 
 import java.util.Date;
 
-public class Articulo {
-    private int idArticulo;
+public class NoticiaPropia {
+    private int idNoticia;
     private int idUsuario;
     private String titulo;
     private String autor;
-    private String contenido;
+    private String url;
+    private String fuente;
+    private String descripcion;
     private String imagen;
+    private String contenido;
     private Date fechaPublicacion;
     private String estado;
     private String categoria;
     private int meGusta;
     private int noMeGusta;
-    // Nuevos campos para manejar la interacción del usuario
+    // Campos para manejar interacción del usuario
     private boolean usuarioDioLike;
     private boolean usuarioDioNoMeGusta;
     private boolean puedeDarLike; // Para verificar permisos
-    public Articulo() {}
+
+    public NoticiaPropia() {}
 
     // Constructor completo actualizado
-    public Articulo(int idArticulo, int idUsuario, String titulo, String autor, String contenido, String imagen, 
-                    Date fechaPublicacion, String estado, String categoria, int meGusta, int noMeGusta,
-                    boolean usuarioDioLike, boolean usuarioDioNoMeGusta) {
-        this.idArticulo = idArticulo;
+    public NoticiaPropia(int idNoticia, int idUsuario, String titulo, String autor, String url, 
+                        String fuente, String descripcion, String imagen, String contenido,
+                        Date fechaPublicacion, String estado, String categoria, 
+                        int meGusta, int noMeGusta, boolean usuarioDioLike, 
+                        boolean usuarioDioNoMeGusta) {
+        this.idNoticia = idNoticia;
         this.idUsuario = idUsuario;
         this.titulo = titulo;
         this.autor = autor;
-        this.contenido = contenido;
+        this.url = url;
+        this.fuente = fuente;
+        this.descripcion = descripcion;
         this.imagen = imagen;
+        this.contenido = contenido;
         this.fechaPublicacion = fechaPublicacion;
         this.estado = estado;
         this.categoria = categoria;
@@ -40,13 +49,13 @@ public class Articulo {
         this.puedeDarLike = true; // Por defecto true, se puede modificar según lógica de negocio
     }
 
-    // Getters y setters
-    public int getIdArticulo() {
-        return idArticulo;
+    // Getters y setters básicos
+    public int getIdNoticia() {
+        return idNoticia;
     }
 
-    public void setIdArticulo(int idArticulo) {
-        this.idArticulo = idArticulo;
+    public void setIdNoticia(int idNoticia) {
+        this.idNoticia = idNoticia;
     }
 
     public int getIdUsuario() {
@@ -73,12 +82,28 @@ public class Articulo {
         this.autor = autor;
     }
 
-    public String getContenido() {
-        return contenido;
+    public String getUrl() {
+        return url;
     }
 
-    public void setContenido(String contenido) {
-        this.contenido = contenido;
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getFuente() {
+        return fuente;
+    }
+
+    public void setFuente(String fuente) {
+        this.fuente = fuente;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public String getImagen() {
@@ -87,6 +112,14 @@ public class Articulo {
 
     public void setImagen(String imagen) {
         this.imagen = imagen;
+    }
+
+    public String getContenido() {
+        return contenido;
+    }
+
+    public void setContenido(String contenido) {
+        this.contenido = contenido;
     }
 
     public Date getFechaPublicacion() {
@@ -128,6 +161,8 @@ public class Articulo {
     public void setNoMeGusta(int noMeGusta) {
         this.noMeGusta = noMeGusta;
     }
+
+    // Getters y setters para interacción de usuario
     public boolean isUsuarioDioLike() {
         return usuarioDioLike;
     }
@@ -152,7 +187,7 @@ public class Articulo {
         this.puedeDarLike = puedeDarLike;
     }
 
-    // Método para incrementar likes
+    // Métodos para manejo de likes/dislikes
     public void incrementarMeGusta() {
         this.meGusta++;
         this.usuarioDioLike = true;
@@ -163,7 +198,6 @@ public class Articulo {
         }
     }
 
-    // Método para incrementar dislikes
     public void incrementarNoMeGusta() {
         this.noMeGusta++;
         this.usuarioDioNoMeGusta = true;
@@ -176,14 +210,14 @@ public class Articulo {
 
     // Método para verificar si el usuario puede interactuar
     public boolean puedeInteractuar(int idUsuarioActual) {
-        // Un usuario no puede dar like a sus propios artículos
+        // Un usuario no puede dar like a sus propias noticias
         return this.idUsuario != idUsuarioActual && this.puedeDarLike;
     }
 
     @Override
     public String toString() {
-        return "Articulo{" +
-                "idArticulo=" + idArticulo +
+        return "NoticiaPropia{" +
+                "idNoticia=" + idNoticia +
                 ", titulo='" + titulo + '\'' +
                 ", meGusta=" + meGusta +
                 ", noMeGusta=" + noMeGusta +
