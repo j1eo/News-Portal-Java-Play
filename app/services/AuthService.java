@@ -250,7 +250,7 @@ public class AuthService {
             }
         }
     }
- // Añade estos métodos a tu AuthService existente
+ 
     public Cuenta getCuentaById(int idCuenta) throws SQLException {
         String sql = "SELECT c.*, a.ID_Admin, u.ID_Usuario, u.Suscripcion " +
                    "FROM Cuenta c " +

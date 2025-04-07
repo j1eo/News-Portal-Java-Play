@@ -18,7 +18,6 @@
 
                     <div class="form-group">
                         <input type="text" name="fechanacimiento" id="fechanacimiento" class="form-control" 
-                               onfocus="(this.type='date')" onblur="(this.type='text')" pattern="\d{2}/\d{2}/\d{4}" 
                                placeholder="Fecha de Nacimiento" required>
                     </div>
 
@@ -50,47 +49,94 @@
         </div>
     </main>
 
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     <script>
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            let email = document.getElementById('email').value;
-            let confirmaEmail = document.getElementById('confirmaemail').value;
-            let password = document.getElementById('password').value;
-            let confpassword = document.getElementById('confpassword').value;
-
-            if (email !== confirmaEmail) {
-                alert("Los correos electrónicos no coinciden.");
-                return;
-            }
-
-            if (password !== confpassword) {
-                alert("Las contraseñas no coinciden.");
-                return;
-            }
-
-            this.submit();
-        });
-
-        document.getElementById('fechanacimiento').addEventListener('blur', function() {
-            if(this.value && this.value.includes('-')) {
-                const parts = this.value.split('-');
-                if(parts.length === 3) {
-                    this.value = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        $(document).ready(function() {
+            //Envío del formulario
+            $('#registerForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                const email = $('#email').val();
+                const confirmaEmail = $('#confirmaemail').val();
+                const password = $('#password').val();
+                const confpassword = $('#confpassword').val();
+                
+                // Validar que los emails coincidan
+                if (email !== confirmaEmail) {
+                    alert("Los correos electrónicos no coinciden.");
+                    return false;
                 }
-            }
-        });
-
-        document.getElementById('fechanacimiento').addEventListener('focus', function() {
-            if(this.value && this.value.includes('/')) {
-                const parts = this.value.split('/');
-                if(parts.length === 3) {
-                    this.type = 'date';
-                    this.value = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                
+                // Validar que las contraseñas coincidan
+                if (password !== confpassword) {
+                    alert("Las contraseñas no coinciden.");
+                    return false;
                 }
-            } else {
-                this.type = 'date';
-            }
+                
+                // Enviar el formulario
+                this.submit();
+            });
+            
+            // Fecha de nacimiento
+            $('#fechanacimiento').on({
+                focus: function() {
+                    $(this).attr('type', 'date');
+                    
+                    // Si tiene valor en formato dd/mm/yyyy, convertirlo a yyyy-mm-dd
+                    const currentValue = $(this).val();
+                    if (currentValue && currentValue.includes('/')) {
+                        const parts = currentValue.split('/');
+                        if (parts.length === 3) {
+                            $(this).val(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                        }
+                    }
+                },
+                blur: function() {
+                    const currentValue = $(this).val();
+                    
+                    // Si tiene valor en formato yyyy-mm-dd, convertirlo a dd/mm/yyyy
+                    if (currentValue && currentValue.includes('-')) {
+                        const parts = currentValue.split('-');
+                        if (parts.length === 3) {
+                            $(this).val(`${parts[2]}/${parts[1]}/${parts[0]}`);
+                        }
+                    }
+                    
+                    $(this).attr('type', 'text');
+                }
+            });
+            
+            // Validación de email
+            $('#confirmaemail').on('input', function() {
+                const email = $('#email').val();
+                const confirmaEmail = $(this).val();
+                
+                if (email && confirmaEmail && email !== confirmaEmail) {
+                    $(this).addClass('error-input');
+                } else {
+                    $(this).removeClass('error-input');
+                }
+            });
+            
+            // Validación de contraseña
+            $('#confpassword').on('input', function() {
+                const password = $('#password').val();
+                const confpassword = $(this).val();
+                
+                if (password && confpassword && password !== confpassword) {
+                    $(this).addClass('error-input');
+                } else {
+                    $(this).removeClass('error-input');
+                }
+            });
         });
     </script>
+
+    <style>
+        .error-input {
+            border: 1px solid red !important;
+        }
+    </style>
 }

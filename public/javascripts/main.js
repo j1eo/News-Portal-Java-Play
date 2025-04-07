@@ -1,15 +1,19 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // Cargar noticias y artículos al iniciar
-    cargarNoticiasMilenio();
-    cargarNoticiasElPais();
-    cargarArticulos();
+    // Only load what's needed for the current page
+    if (document.getElementById("noticias-lista-milenio")) {
+        cargarNoticiasMilenio();
+    }
+    if (document.getElementById("noticias-lista-elpais")) {
+        cargarNoticiasElPais();
+    }
+    if (document.getElementById("form-articulo")) {
+        document.getElementById("form-articulo").addEventListener("submit", function (event) {
+            event.preventDefault();
+            agregarArticulo();
+        });
+    }
 
-    // Configurar el formulario para agregar artículos
-    document.getElementById("form-articulo").addEventListener("submit", function (event) {
-        event.preventDefault();
-        agregarArticulo();
-    });
-
+    // These are probably safe to keep global
     document.getElementById("overlay").addEventListener("click", closeNav);
 
     function openNav() {
@@ -22,9 +26,12 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("overlay").style.display = "none";
     }
 
-    // Eventos para el sidenav
-    document.querySelector(".closebtn").addEventListener("click", closeNav);
-    document.querySelector("[onclick='openNav()']").addEventListener("click", openNav);
+    // Null check for sidenav elements
+    const closeBtn = document.querySelector(".closebtn");
+    const openBtn = document.querySelector("[onclick='openNav()']");
+    
+    if (closeBtn) closeBtn.addEventListener("click", closeNav);
+    if (openBtn) openBtn.addEventListener("click", openNav);
 });
 
 // Funciones para cargar noticias de Milenio
